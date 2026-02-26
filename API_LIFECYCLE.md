@@ -55,4 +55,4 @@ The API adheres to standard HTTP status codes:
 | 429         | Rate limit exceeded                                 |
 | 500         | Unexpected internal processing error                |
 
-Internal error details are not exposed in API responses.                                     |
+Internal error details are not exposed in API responses.
