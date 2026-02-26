@@ -23,12 +23,12 @@ jobs:
       - name: Install Testing Tools (Newman & Prism)
         run: npm install -g newman @stoplight/prism-cli
 
-      - name: Force Collection Alignment
+      - name: Prepare Workspace and Fix Collection
         run: |
-          mkdir -p assets
-          echo "fake-binary-content" > assets/input.jpg
+          echo "fake image content" > test-image.jpg
           sed -i 's|https://api.lumatrace.es|{{baseUrl}}|g' postman/LumaTrace_Cloud_API.postman_collection.json
-          sed -i 's|"src": ".*"|"src": "assets/input.jpg"|g' postman/LumaTrace_Cloud_API.postman_collection.json
+          sed -i 's|"src": ".*"|"src": "test-image.jpg"|g' postman/LumaTrace_Cloud_API.postman_collection.json
+          sed -i 's|/api/v1/auth/logout/|/api/v1/auth/logout|g' postman/LumaTrace_Cloud_API.postman_collection.json
 
       - name: Start OpenAPI Mock Server (Prism)
         run: prism mock api/openapi.yaml -p 4010 > prism.log 2>&1 &
@@ -46,4 +46,6 @@ jobs:
 
       - name: Debug Prism on Failure
         if: failure()
-        run: cat prism.log
+        run: |
+          echo "--- PRISM LOGS ---"
+          cat prism.log
