@@ -34,7 +34,49 @@ LumaTrace is built for regulated B2B environments. Our architecture guarantees:
 
 To ensure high-quality content provenance, LumaTrace uses adaptive spread-spectrum injection. This ensures the watermark is invisible to the human eye while remaining statistically robust for forensic detection.
 
-*(Note: Add your Before/After and Signal Map images here)*
+|    Original Asset (`input.jpg`)     |   Protected Asset (`protected_final.jpg`)      |    Signal Map (Enhanced Difference)      |
+|:-----------------------------------:|:----------------------------------------------:|:----------------------------------------:|
+| ![Original Asset](assets/input.jpg) | ![Protected Asset](assets/protected_final.jpg) | ![Signal Map](assets/difference_map.png) |
+|      *No watermark signature*       |          *Encoded with Seed 8049...*           |      *Spatial signal distribution*       |
+
+
+### Psychovisual Insights
+* **Luma Masking:** The signal is heavily masked in high-texture areas (buildings, cars).
+* **Sky Protection:** Using `MIN_GAIN = 1.2`, grain was eliminated in low-entropy regions (sky).
+* **Color Constancy:** Injection is balanced across RGB channels to prevent color shifting.
+
+---
+
+## Technical Validation & Provenance Flow
+
+The following end-to-end test demonstrates the binding between Cloud Metadata and the physical asset.
+
+### 1 Cloud Registration (C2PA Manifest)
+We registered the asset metadata (Device, GPS, User) via the Cloud API to obtain a unique cryptographic seed.
+
+![Cloud Registration](assets/01-cloud-registration.png)
+
+### 2️ Forensic Signal Injection
+Using the generated seed `8049473336066145901`, we injected the watermark into `input.jpg`.
+* **Latency:** 227 ms
+* **Z-Score (σ):** 97 (Extreme high confidence)
+
+![Forensic Injection](assets/02-cli-protection.png)
+
+### 3 Robustness Audit (Original State)
+Validation of the signal immediately after injection to establish the high-entropy baseline.
+* **Z-Score (σ):** 97.48 (Extreme high confidence)
+* **Status:** VALIDATED
+
+![Robustness Audit](assets/03-robustness-audit.png)
+
+### 4 Tamper Verification (Stress Test)
+The asset was subjected to aggressive degradation (Heavy resizing and JPEG compression).
+* **Survival:** The signal remains verified even after structural tampering.
+* **Resulting Z-Score (σ):** 44.34 (Remains 11x above the detection threshold)
+* **Analysis Latency:** 136 ms
+
+![Tamper Verification](assets/04-tamper-verification.png)
 
 ### Psychovisual Insights
 * **Luma Masking:** The signal is heavily masked in high-texture areas.
