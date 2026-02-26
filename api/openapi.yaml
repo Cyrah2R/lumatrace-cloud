@@ -47,6 +47,9 @@ paths:
       responses:
         '200':
           description: Authentication successful
+          headers:
+            x-request-id:
+              $ref: '#/components/headers/x-request-id'
           content:
             application/json:
               schema:
@@ -56,7 +59,7 @@ paths:
                     type: string
                     description: Bearer JWT Token
         '401':
-          description: Invalid credentials
+          $ref: '#/components/responses/UnauthorizedError'
 
   /api/v1/auth/logout:
     post:
@@ -67,11 +70,14 @@ paths:
       responses:
         '200':
           description: Session successfully terminated
+          headers:
+            x-request-id:
+              $ref: '#/components/headers/x-request-id'
 
   /api/v1/photos/register:
     post:
       summary: Register Asset Metadata (Legacy/Metadata-Only)
-      description: Registers an asset's forensic metadata and returns the signed C2PA canonical JSON. Does not inject the physical watermark.
+      description: Registers an asset's forensic metadata and returns the signed C2PA canonical JSON.
       tags:
         - Provenance
       requestBody:
@@ -83,15 +89,20 @@ paths:
       responses:
         '200':
           description: Asset registered successfully
+          headers:
+            x-request-id:
+              $ref: '#/components/headers/x-request-id'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PhotoRegistrationResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
 
   /api/v1/photos/protect:
     post:
       summary: Full C2PA & Watermark Protection Workflow
-      description: Receives a raw image, embeds the spatial soft-binding watermark, injects the binary C2PA JUMBF manifest, and returns the cryptographically sealed asset.
+      description: Receives a raw image, embeds spatial watermark, and injects C2PA JUMBF manifest.
       tags:
         - Provenance
       requestBody:
@@ -105,22 +116,31 @@ paths:
                 image:
                   type: string
                   format: binary
-                  description: The raw image payload (Max 25MB, 16MP).
+                  description: Raw image payload (Max 25MB).
                 request:
                   $ref: '#/components/schemas/PhotoRegistrationRequest'
       responses:
         '200':
-          description: Protected asset successfully generated
+          description: Protected asset generated
+          headers:
+            x-request-id:
+              $ref: '#/components/headers/x-request-id'
           content:
             image/jpeg:
               schema:
                 type: string
                 format: binary
+        '413':
+          description: Payload too large (Exceeds 25MB or 16MP)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
 
   /api/v1/photos/verify:
     post:
       summary: Dual-Path Verification (Hard & Soft Binding)
-      description: Strictly verifies both the C2PA JUMBF manifest and the LumaTrace spatial signal. Enforces tenant isolation.
+      description: Strictly verifies both C2PA and LumaTrace spatial signal.
       tags:
         - Forensic Verification
       requestBody:
@@ -141,14 +161,21 @@ paths:
       responses:
         '200':
           description: Verification completed
+          headers:
+            x-request-id:
+              $ref: '#/components/headers/x-request-id'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/VerificationResponse'
         '403':
-          description: Identity mismatch or Tenant isolation boundary violation
+          $ref: '#/components/responses/ForbiddenError'
         '404':
-          description: Asset not found in registry
+          description: Asset not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
 
 components:
   securitySchemes:
@@ -157,19 +184,51 @@ components:
       scheme: bearer
       bearerFormat: JWT
 
+  headers:
+    x-request-id:
+      description: Unique ID for tracing requests across microservices and support tickets.
+      schema:
+        type: string
+        example: "req-f47ac10b-58cc-4372"
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    ForbiddenError:
+      description: Tenant boundary violation or insufficient permissions.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+
   schemas:
+    ApiError:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+          example: "TENANT_ACCESS_DENIED"
+        message:
+          type: string
+          description: Human-readable error message.
+          example: "You do not have permission to access assets from another organization."
+        traceId:
+          type: string
+          description: Correlation ID for support.
+          example: "req-f47ac10b-58cc-4372"
+
     PhotoRegistrationRequest:
       type: object
       required: [contentHash, deviceModel, latitude, longitude]
       properties:
-        userId:
-          type: string
-          description: Extracted automatically from JWT context.
-          readOnly: true
         contentHash:
           type: string
           pattern: '^[a-fA-F0-9]{64}$'
-          description: SHA-256 Hexadecimal string of the original asset.
           example: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         deviceModel:
           type: string
@@ -177,14 +236,10 @@ components:
         latitude:
           type: number
           format: double
-          minimum: -90.0
-          maximum: 90.0
           example: 40.4168
         longitude:
           type: number
           format: double
-          minimum: -180.0
-          maximum: 180.0
           example: -3.7038
 
     PhotoRegistrationResponse:
@@ -193,38 +248,26 @@ components:
         photoId:
           type: string
           format: uuid
-          example: "550e8400-e29b-41d4-a716-446655440000"
         tenantId:
           type: string
-          example: "org_enterprise_001"
         createdAt:
           type: string
           format: date-time
-          example: "2026-02-25T14:30:00Z"
         canonicalJson:
           type: string
-          description: The canonicalized C2PA assertion JSON.
         canonicalHash:
           type: string
-          description: SHA-256 hash of the canonical JSON.
         signature:
           type: string
-          description: Base64 encoded RSA-PSS signature.
 
     VerificationResponse:
       type: object
       properties:
         authentic:
           type: boolean
-          example: true
         confidenceScore:
           type: number
-          format: double
-          description: Z-Score (σ) of the spatial detection.
-          example: 97.48
         tenantId:
           type: string
-          example: "org_enterprise_001"
         message:
           type: string
-          example: "Status: [C2PA Manifest: PRESENT] [Forensic Watermark: DETECTED]"
