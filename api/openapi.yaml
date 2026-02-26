@@ -3,19 +3,22 @@ info:
   title: LumaTrace Cloud API
   description: |
     Enterprise API for LumaTrace Digital Watermarking and C2PA Provenance.
-    
-    This API provides spatial watermarking (Soft-Binding) and C2PA JUMBF manifest orchestration (Hard-Binding) 
-    within a multi-tenant, zero-trust framework.
+    Spatial watermarking and C2PA JUMBF orchestration within a multi-tenant, zero-trust framework.
   version: 1.0.0
   contact:
     name: LumaTrace Enterprise Support
     email: enterprise@lumatrace.es
+  license:
+    name: Proprietary
+    url: https://lumatrace.es/license
 
 servers:
   - url: https://api.lumatrace.es
     description: Production Environment
   - url: https://sandbox.api.lumatrace.es
     description: Sandbox Environment
+  - url: http://127.0.0.1:8081
+    description: Local Development
 
 security:
   - bearerAuth: []
@@ -23,6 +26,7 @@ security:
 paths:
   /api/v1/auth/login:
     post:
+      operationId: loginTenant
       summary: Authenticate Tenant Session
       tags: ["Identity & Access"]
       security: []
@@ -52,6 +56,7 @@ paths:
 
   /api/v1/photos/protect:
     post:
+      operationId: protectAsset
       summary: Full C2PA & Watermark Protection
       description: Injects spatial signal and signs C2PA manifest.
       tags: ["Provenance"]
@@ -63,11 +68,8 @@ paths:
               type: object
               required: [image, request]
               properties:
-                image:
-                  type: string
-                  format: binary
-                request:
-                  $ref: '#/components/schemas/PhotoRegistrationRequest'
+                image: { type: string, format: binary }
+                request: { $ref: '#/components/schemas/PhotoRegistrationRequest' }
       responses:
         '200':
           description: Protected binary asset.
@@ -75,15 +77,16 @@ paths:
             image/jpeg: { schema: { type: string, format: binary } }
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
-        '403': { $ref: '#/components/responses/Forbidden' }
         '413': { $ref: '#/components/responses/PayloadTooLarge' }
         '500': { $ref: '#/components/responses/InternalError' }
 
   /api/v1/photos/verify:
     post:
+      operationId: verifyAsset
       summary: Dual-Path Verification
       tags: ["Forensic Verification"]
       requestBody:
+        required: true
         content:
           multipart/form-data:
             schema:
@@ -91,7 +94,7 @@ paths:
               required: [image, photoId]
               properties:
                 image: { type: string, format: binary }
-                photoId: { type: string, format: uuid }
+                photoId: { type: string, format: uuid, example: "550e8400-e29b-41d4-a716-446655440000" }
       responses:
         '200':
           description: Verification success.
@@ -110,29 +113,26 @@ components:
   headers:
     x-request-id:
       description: Unique correlation ID for support.
-      schema: { type: string, example: "req-7b2a..." }
+      schema: { type: string, example: "req-7b2a-f47a-c10b" }
 
   responses:
     BadRequest:
-      description: Malformed request or invalid hash.
+      description: Malformed request.
       content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
     Unauthorized:
-      description: JWT expired or invalid.
-      content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
-    Forbidden:
-      description: Tenant isolation boundary violation.
+      description: Invalid JWT.
       content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
     NotFound:
       description: Asset not found.
       content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
     PayloadTooLarge:
-      description: File exceeds 25MB limit.
+      description: File exceeds limit.
       content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
     TooManyRequests:
       description: Rate limit exceeded.
       content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
     InternalError:
-      description: Server-side cryptographic failure.
+      description: Server-side failure.
       content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
 
   schemas:
@@ -141,13 +141,17 @@ components:
       properties:
         code: { type: string, example: "AUTH_TOKEN_EXPIRED" }
         message: { type: string, example: "The provided token is no longer valid." }
-        traceId: { type: string, example: "req-f47a..." }
+        traceId: { type: string, example: "req-f47a-c10b" }
 
     PhotoRegistrationRequest:
       type: object
       required: [contentHash, deviceModel]
       properties:
-        contentHash: { type: string, pattern: '^[a-fA-F0-9]{64}$', example: "e3b0c4..." }
+        contentHash:
+          type: string
+          pattern: '^[a-fA-F0-9]{64}$'
+          description: SHA-256 Hexadecimal string.
+          example: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         deviceModel: { type: string, example: "Sony_Alpha_Node_1" }
         latitude: { type: number, example: 40.41 }
         longitude: { type: number, example: -3.70 }
