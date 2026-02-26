@@ -1,10 +1,18 @@
-# LumaTrace Cloud - Enterprise C2PA & Soft-Binding Integration Hub
+# LumaTrace Cloud
 
-LumaTrace is an invisible and resilient digital watermarking solution designed for intellectual property protection in enterprise environments. It implements proprietary Spread-Spectrum algorithms with psycho-visual optimization and seamlessly integrates C2PA manifest orchestration for end-to-end provenance integrity.
+**Enterprise C2PA & Analog-Hole Mitigation Hub**
+
+[![Enterprise Ready](https://img.shields.io/badge/Enterprise-Ready-success.svg)](#) [![Architecture](https://img.shields.io/badge/Architecture-Air_Gapped_Microservices-blue.svg)](#) [![Security](https://img.shields.io/badge/Security-SOC2_Ready-purple.svg)](#)
+
+LumaTrace is an enterprise-grade forensic provenance ecosystem designed to bridge the critical gap in the **C2PA (Coalition for Content Provenance and Authenticity)** standard: the **Analog Hole**.
+
+While standard C2PA provides cryptographic "hard-binding", metadata manifests are stripped during screenshots, optical recapture, or social media uploads. LumaTrace acts as the **"Soft-Binding Bridge"**. It embeds a deterministic, HVS-optimized invisible spatial watermark directly into the image pixels, ensuring that the cryptographic seed tying the asset to its original C2PA manifest survives any non-destructive transformation.
 
 This repository serves as the **Public Developer Portal and Trust Center** for the LumaTrace B2B platform.
 
 *(Note: The core mathematical engine and backend microservices are maintained in private, air-gapped enterprise repositories to ensure strict IP protection and supply chain security. See [ARCHITECTURE.md](./ARCHITECTURE.md) for details).*
+
+---
 
 ## Enterprise Use Cases
 * **Copyright Enforcement:** Cryptographically bind photographer/creator identities to physical asset pixels.
@@ -13,12 +21,14 @@ This repository serves as the **Public Developer Portal and Trust Center** for t
 
 ---
 
-## Trust, Security & Assurance
-To ensure enterprise-grade reliability, we provide full transparency on our security posture:
-* **[Trust Center](./TRUST_CENTER.md):** Centralized index of all security and compliance artifacts.
-* **[Security Policy](./SECURITY.md):** Vulnerability disclosure process and security SLAs.
-* **[Data Handling](DATA_PRIVACY.md):** GDPR compliance and Zero-Retention image policy.
-* **[Public Assurance](./ASSURANCE.md):** High-level evidence of our Secure SDLC and cryptographic controls.
+## Ecosystem Architecture (The 4 Pillars)
+
+To enforce strict Separation of Concerns (SoC) and supply-chain security, the LumaTrace platform is decoupled into four independent modules:
+
+1. **`lumatrace-core` (Private):** Pure Java 21 DSP Engine. Generates deterministic PRNG signatures and Z-Score detection without external dependencies.
+2. **`lumatrace-server` (Private):** Spring Boot 3.2 Governance Cloud. Handles PKI for C2PA signing, multi-tenant isolation, and stateless API contracts.
+3. **`lumatrace-mobile` (Private):** Native Android Capture Sensor. Provides point-of-capture forensic signing via CameraX and Keystore hardware integration.
+4. **`lumatrace-cloud` (This Repo):** The Public Data Room and API Gateway documentation for Enterprise integration.
 
 ---
 
@@ -75,7 +85,7 @@ The asset was subjected to aggressive degradation (Heavy resizing and JPEG compr
 
 Authentication via Tenant-Aware JWT is strictly required.
 
-> 🚀 **Quick Start:** Download our [Postman Collection](./postman/LumaTrace_Cloud_API.postman_collection.json) to test the integration instantly. See the `/examples` folder for Python and Node.js SDK snippets.
+> **Quick Start:** Download our [Postman Collection](./postman/LumaTrace_Cloud_API.postman_collection.json) to test the integration instantly. See the `/examples` folder for Python and Node.js SDK snippets.
 
 ### Request (cURL)
 
@@ -91,7 +101,7 @@ curl -X POST "https://api.lumatrace.es/api/v1/photos/register" \
 "contentHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
 }'
 ```
-(Note: userId and tenantId are securely derived from the JWT context and do not need to be passed in the payload).
+(Note: userId and tenantId are securely derived from the backend JWT context to prevent IDOR vulnerabilities and do not need to be passed in the payload).
 
 ## Full API Reference
 
@@ -99,12 +109,17 @@ Explore the complete API contract, payload schemas, and response types in our in
 
 **[Launch Interactive API Documentation](https://cyrah2r.github.io/lumatrace-cloud/)**
 
-## Licensing & Commercial Terms
+---
 
-LumaTrace operates under a B2B SaaS licensing model to guarantee enterprise-grade protection, SLA-backed performance, and strict Supply Chain Security.
+## Compliance, Licensing & Procurement (Data Room)
+To ensure enterprise-grade reliability, LumaTrace operates under a B2B SaaS licensing model guaranteeing SLA-backed performance and strict Supply Chain Security.
 
-For commercial inquiries, SOC2/ISO27001 mapping requests, or Sandbox access:
+We provide full transparency on our security posture for Due Diligence processes:
+* **[Trust Center](./TRUST_CENTER.md):** Centralized index of all security and compliance artifacts.
+* **[Security Policy](./SECURITY.md):** Vulnerability disclosure process and security SLAs.
+* **[Data Handling](DATA_PRIVACY.md):** GDPR compliance and Zero-Retention image policy.
+* **[Public Assurance](./ASSURANCE.md):** High-level evidence of our Secure SDLC and cryptographic controls.
 
-contact@lumatrace.es
+NDA Data Room Pack: For deep-dive procurement, SOC2/ISO27001 mapping requests, Penetration Test Summaries, or full C2PA Cryptographic Profiles, please request our NDA Data Room Pack at: contact@lumatrace.es
 
 © 2026 LumaTrace Project.
