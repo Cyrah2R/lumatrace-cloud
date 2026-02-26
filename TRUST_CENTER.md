@@ -13,6 +13,13 @@ This section centralizes public governance and security documentation for procur
 - [Security Policy](./SECURITY.md)
 - [Security Assurance & Engineering Practices](./ASSURANCE.md)
 - [Enterprise Data Privacy Policy](./DATA_PRIVACY.md)
+- [Authorized Subprocessors & Data Residency](./SUBPROCESSORS.md)
+
+---
+
+## Operations & Reliability
+
+- [Service Level Agreement (SLA) & Incident Response](./SLA_AND_INCIDENTS.md)
 
 ---
 
