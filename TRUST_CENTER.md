@@ -34,4 +34,6 @@ This section centralizes public governance and security documentation for procur
 
 ## Additional Enterprise Artifacts
 
+- [Security Questionnaire Starter Pack (CAIQ-Lite)](./CAIQ_LITE.md)
+
 Additional technical artifacts (e.g., STRIDE threat models, SBOM summaries, internal control mappings) may be shared under NDA with qualified enterprise security reviewers upon request.

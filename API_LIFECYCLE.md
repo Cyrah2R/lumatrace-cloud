@@ -1,58 +1,19 @@
-# LumaTrace API Lifecycle & Governance Policy
+# API Lifecycle & Compatibility Policy
 
-This document defines versioning, deprecation, and operational stability guarantees for enterprise integrators.
+To ensure operational stability for our Enterprise tenants, LumaTrace enforces a strict API lifecycle and versioning governance model.
 
----
+## 1. Versioning Strategy
+We use semantic versioning globally at the API path level (e.g., `/api/v1/`).
+* **Non-Breaking Changes:** Additions of new endpoints, optional parameters, or new response properties will be applied to the current version without notice.
+* **Breaking Changes:** Any removal of endpoints, required parameters, or changes in response schema will trigger a major version bump (e.g., `/api/v2/`).
 
-## API Versioning
+## 2. Deprecation & Sunset Windows
+When an API version or specific endpoint is scheduled for deprecation, we commit to the following timeline:
+* **Announcement:** 12 months prior to the final sunset date. Communication is sent via the Enterprise Status channel and email to registered technical contacts.
+* **Deprecation Headers:** Deprecated endpoints will include standard IETF HTTP response headers:
+    * `Deprecation: @<timestamp>`
+    * `Link: <https://api.lumatrace.es/docs/changelog>; rel="deprecation"`
+* **Sunset Phase:** Following the 12-month window, the endpoint will return a `410 Gone` status code.
 
-LumaTrace follows Semantic Versioning principles.
-
-- The API version is defined in the URL path (e.g., `/api/v1/`).
-- Backwards-compatible changes do not increment the major version.
-- Breaking changes require a new major version.
-
----
-
-## Deprecation Policy
-
-If a breaking change becomes necessary:
-
-1. Tenant administrators will be notified at least 6 months in advance.
-2. Deprecated endpoints will return a `Sunset` HTTP header during the transition period.
-3. The previous version will remain operational until the sunset date.
-
----
-
-## Rate Limiting
-
-Token-bucket rate limiting is enforced at the API ingress layer to ensure service stability.
-
-Authentication:
-- 10 requests per minute per IP
-
-Verification:
-- 100 requests per minute (standard tier)
-
-Protection endpoints:
-- Rate limits aligned with tenant SLA tier
-
-HTTP `429 Too Many Requests` is returned when limits are exceeded.
-
----
-
-## Standardized Error Codes
-
-The API adheres to standard HTTP status codes:
-
-| HTTP Code   | Description                                         |
-|-------------|-----------------------------------------------------|
-| 400         | Malformed or invalid request payload                |
-| 401         | Missing, expired, or invalid authentication token   |
-| 403         | Authorization failure or tenant isolation violation |
-| 404         | Requested resource not found                        |
-| 413         | Payload exceeds size or resolution limits           |
-| 429         | Rate limit exceeded                                 |
-| 500         | Unexpected internal processing error                |
-
-Internal error details are not exposed in API responses.
+## 3. Client Requirements
+Integration clients MUST ignore unrecognized fields in JSON responses to ensure forward compatibility with non-breaking additions.

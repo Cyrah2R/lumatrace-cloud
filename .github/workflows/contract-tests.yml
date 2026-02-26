@@ -36,10 +36,6 @@ jobs:
                 if (item.item) {
                   fixItems(item.item);
                 } else {
-                  if (item.name.includes('Logout') || item.name.includes('Register')) {
-                    items.splice(i, 1);
-                    continue;
-                  }
           
                   if (item.request && item.request.url && item.request.url.raw) {
                     item.request.url.raw = item.request.url.raw.replace(/https:\/\/api\.lumatrace\.es/g, '{{base_url}}');

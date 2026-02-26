@@ -39,14 +39,7 @@ paths:
     post:
       operationId: loginTenant
       summary: Authenticate Service Account
-      description: |
-        Authenticates a tenant-scoped service account.
-
-        Token characteristics:
-        - JWT RS256 signed
-        - 15 minute expiration
-        - Non-refreshable
-        - Must be re-issued via login endpoint
+      description: Validates credentials and returns a signed JWT.
       tags: ["Identity & Access"]
       security: []
       requestBody:
@@ -65,21 +58,70 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LoginResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/v1/auth/logout:
+    post:
+      operationId: logoutTenant
+      summary: Terminate Session
+      description: Actively revokes the current session by placing the provided JWT in the blocklist.
+      tags: ["Identity & Access"]
+      responses:
+        '200':
+          description: Session successfully terminated.
+          headers:
+            x-request-id:
+              $ref: '#/components/headers/x-request-id'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string, example: "Session successfully terminated" }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/v1/photos/register:
+    post:
+      operationId: registerMetadata
+      summary: Register Asset Metadata
+      description: Registers forensic metadata returning a PhotoRegistrationResponse.
+      tags: ["Provenance"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhotoRegistrationRequest'
+      responses:
+        '200':
+          description: Metadata registered successfully.
+          headers:
+            x-request-id:
+              $ref: '#/components/headers/x-request-id'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhotoRegistrationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
 
   /api/v1/photos/protect:
     post:
       operationId: protectAsset
       summary: Full C2PA & Watermark Protection
-      description: |
-        Injects spatial watermark signal and signs C2PA manifest.
-
-        Idempotency:
-        - Clients SHOULD provide `Idempotency-Key`.
-        - Same key within 24h returns same result.
+      description: Injects spatial watermark signal and signs C2PA manifest.
       tags: ["Provenance"]
       parameters:
         - $ref: '#/components/parameters/IdempotencyKey'
@@ -94,7 +136,7 @@ paths:
                 image:
                   type: string
                   format: binary
-                  description: "Raw image payload. Constraints: Max size 25MB, Max resolution 16 Megapixels (e.g., 4000x4000), Formats: JPEG, PNG."
+                  description: "Raw image payload. Constraints: Max size 25MB."
                 request:
                   $ref: '#/components/schemas/PhotoRegistrationRequest'
       responses:
@@ -127,8 +169,7 @@ paths:
     post:
       operationId: verifyAsset
       summary: Dual-Path Verification
-      description: |
-        Performs spatial watermark detection and C2PA manifest validation.
+      description: Performs spatial watermark detection and C2PA manifest validation.
       tags: ["Forensic Verification"]
       requestBody:
         required: true
@@ -155,8 +196,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VerificationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '429':
@@ -239,7 +284,7 @@ components:
             $ref: '#/components/schemas/ApiError'
 
     PayloadTooLarge:
-      description: File exceeds maximum size (20MB).
+      description: File exceeds maximum size (25MB).
       headers:
         x-request-id:
           $ref: '#/components/headers/x-request-id'
@@ -292,20 +337,6 @@ components:
           type: string
           example: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
 
-    ApiError:
-      type: object
-      required: [code, message, traceId]
-      properties:
-        code:
-          type: string
-          example: "AUTH_TOKEN_EXPIRED"
-        message:
-          type: string
-          example: "The provided token is expired."
-        traceId:
-          type: string
-          example: "req-f47a-c10b"
-
     PhotoRegistrationRequest:
       type: object
       required: [contentHash, deviceModel]
@@ -325,6 +356,20 @@ components:
           type: number
           example: -3.70
 
+    PhotoRegistrationResponse:
+      type: object
+      properties:
+        photoId:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        tenantId:
+          type: string
+          example: "tenant_alpha_01"
+        signature:
+          type: string
+          example: "MEUCIQD..."
+
     VerificationResponse:
       type: object
       properties:
@@ -334,6 +379,23 @@ components:
         confidenceScore:
           type: number
           example: 97.48
+        tenantId:
+          type: string
+          example: "tenant_alpha_01"
         message:
           type: string
-          example: "Validation successful"
+          example: "Status: [C2PA Manifest: PRESENT] [Forensic Watermark: DETECTED]"
+
+    ApiError:
+      type: object
+      required: [code, message, traceId]
+      properties:
+        code:
+          type: string
+          example: "AUTH_TOKEN_EXPIRED"
+        message:
+          type: string
+          example: "The provided token is expired."
+        traceId:
+          type: string
+          example: "req-f47a-c10b"
