@@ -22,4 +22,4 @@ To maintain the cryptographic chain of custody, LumaTrace only persists the foll
 * **Residency:** By default, EU client metadata is processed and stored exclusively within European Union (EU) data centers to ensure strict GDPR compliance.
 
 ## 4. Multi-Tenant Data Isolation
-LumaTrace employs a strict logical separation model. Every API request is contextually bound to a `tenantId` derived cryptographically from the JWT signature. It is mathematically and architecturally impossible for Tenant A to query, modify, or verify metadata belonging to Tenant B.
+LumaTrace employs a strict logical separation model. Every API request is contextually bound to a `tenantId` derived cryptographically from the JWT signature. Multi-tenant boundaries are strictly enforced at the database level and JWT context, preventing unauthorized cross-tenant data access.
