@@ -96,9 +96,9 @@ curl -X POST "[https://api.lumatrace.es/api/v1/photos/register](https://api.luma
 ```
 ## Full API Reference
 
-Explore the complete API contract, payload schemas, and response types in our OpenAPI standard definition:
+Explore the complete API contract, payload schemas, and response types in our interactive Developer Portal:
 
-[View OpenAPI 3.0 Specification](./api/openapi.yaml)
+**[Launch Interactive API Documentation](https://cyrah2r.github.io/lumatrace-cloud/)**
 
 ## Licensing & Commercial Terms
 
