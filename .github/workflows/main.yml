@@ -8,12 +8,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Validate OpenAPI Definition
-        uses: char0n/swagger-editor-validate@v1
-        env:
-          PUPPETEER_NO_SANDBOX: "true"
-        with:
-          definition-file: api/openapi.yaml
+      - name: Validate OpenAPI with Redocly
+        run: npx @redocly/cli lint api/openapi.yaml
 
       - name: Check Documentation Links
         uses: gaurav-nelson/github-action-markdown-link-check@v1
