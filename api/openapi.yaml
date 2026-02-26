@@ -1,0 +1,230 @@
+openapi: 3.0.3
+info:
+  title: LumaTrace Cloud API
+  description: |
+    Enterprise API for LumaTrace Digital Watermarking and C2PA Provenance.
+    
+    This API provides endpoints for authenticating tenants, registering cryptographic asset metadata, injecting spatial watermarks (Soft-Binding), and generating/verifying C2PA JUMBF manifests (Hard-Binding).
+  version: 1.0.0
+  contact:
+    name: LumaTrace Enterprise Support
+    email: contact@lumatrace.es
+    url: https://lumatrace.es
+
+servers:
+  - url: https://api.lumatrace.es
+    description: Production Environment (Enterprise B2B)
+  - url: https://sandbox.api.lumatrace.es
+    description: Sandbox / Integration Environment
+  - url: http://localhost:8081
+    description: Local Development
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/v1/auth/login:
+    post:
+      summary: Authenticate Tenant Session
+      description: Validates credentials and returns a strictly scoped, tenant-aware JWT.
+      tags:
+        - Identity & Access
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                  example: "api_service_account"
+                password:
+                  type: string
+                  example: "secure_password_here"
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: Bearer JWT Token
+        '401':
+          description: Invalid credentials
+
+  /api/v1/auth/logout:
+    post:
+      summary: Terminate Session
+      description: Actively revokes the JWT session placing it in a distributed blocklist.
+      tags:
+        - Identity & Access
+      responses:
+        '200':
+          description: Session successfully terminated
+
+  /api/v1/photos/register:
+    post:
+      summary: Register Asset Metadata (Legacy/Metadata-Only)
+      description: Registers an asset's forensic metadata and returns the signed C2PA canonical JSON. Does not inject the physical watermark.
+      tags:
+        - Provenance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhotoRegistrationRequest'
+      responses:
+        '200':
+          description: Asset registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhotoRegistrationResponse'
+
+  /api/v1/photos/protect:
+    post:
+      summary: Full C2PA & Watermark Protection Workflow
+      description: Receives a raw image, embeds the spatial soft-binding watermark, injects the binary C2PA JUMBF manifest, and returns the cryptographically sealed asset.
+      tags:
+        - Provenance
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [image, request]
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: The raw image payload (Max 25MB, 16MP).
+                request:
+                  $ref: '#/components/schemas/PhotoRegistrationRequest'
+      responses:
+        '200':
+          description: Protected asset successfully generated
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+
+  /api/v1/photos/verify:
+    post:
+      summary: Dual-Path Verification (Hard & Soft Binding)
+      description: Strictly verifies both the C2PA JUMBF manifest and the LumaTrace spatial signal. Enforces tenant isolation.
+      tags:
+        - Forensic Verification
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [image, photoId]
+              properties:
+                image:
+                  type: string
+                  format: binary
+                photoId:
+                  type: string
+                  format: uuid
+                  example: "550e8400-e29b-41d4-a716-446655440000"
+      responses:
+        '200':
+          description: Verification completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+        '403':
+          description: Identity mismatch or Tenant isolation boundary violation
+        '404':
+          description: Asset not found in registry
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    PhotoRegistrationRequest:
+      type: object
+      required: [contentHash, deviceModel, latitude, longitude]
+      properties:
+        userId:
+          type: string
+          description: Extracted automatically from JWT context.
+          readOnly: true
+        contentHash:
+          type: string
+          pattern: '^[a-fA-F0-9]{64}$'
+          description: SHA-256 Hexadecimal string of the original asset.
+          example: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        deviceModel:
+          type: string
+          example: "Enterprise_Capture_Node_A1"
+        latitude:
+          type: number
+          format: double
+          minimum: -90.0
+          maximum: 90.0
+          example: 40.4168
+        longitude:
+          type: number
+          format: double
+          minimum: -180.0
+          maximum: 180.0
+          example: -3.7038
+
+    PhotoRegistrationResponse:
+      type: object
+      properties:
+        photoId:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        tenantId:
+          type: string
+          example: "org_enterprise_001"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-02-25T14:30:00Z"
+        canonicalJson:
+          type: string
+          description: The canonicalized C2PA assertion JSON.
+        canonicalHash:
+          type: string
+          description: SHA-256 hash of the canonical JSON.
+        signature:
+          type: string
+          description: Base64 encoded RSA-PSS signature.
+
+    VerificationResponse:
+      type: object
+      properties:
+        authentic:
+          type: boolean
+          example: true
+        confidenceScore:
+          type: number
+          format: double
+          description: Z-Score (σ) of the spatial detection.
+          example: 97.48
+        tenantId:
+          type: string
+          example: "org_enterprise_001"
+        message:
+          type: string
+          example: "Status: [C2PA Manifest: PRESENT] [Forensic Watermark: DETECTED]"
