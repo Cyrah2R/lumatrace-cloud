@@ -50,7 +50,7 @@ Public cryptography whitepaper available upon request.
 ## 5. Operational Reliability
 
 - Production SLA: 99.9%
-- Status page: https://status.lumatrace.es
+- Status page: `status.lumatrace.es` *(Available upon Enterprise SLA activation)*
 - Incident communication within 24h
 - Postmortems shared with affected enterprise clients
 
