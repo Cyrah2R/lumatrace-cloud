@@ -23,12 +23,45 @@ jobs:
       - name: Install Testing Tools (Newman & Prism)
         run: npm install -g newman @stoplight/prism-cli
 
-      - name: Prepare Workspace and Fix Collection
+      - name: Prepare Workspace and Clean Collection
         run: |
           echo "fake image content" > test-image.jpg
-          sed -i 's|https://api.lumatrace.es|{{baseUrl}}|g' postman/LumaTrace_Cloud_API.postman_collection.json
-          sed -i 's|"src": ".*"|"src": "test-image.jpg"|g' postman/LumaTrace_Cloud_API.postman_collection.json
-          sed -i 's|/api/v1/auth/logout/|/api/v1/auth/logout|g' postman/LumaTrace_Cloud_API.postman_collection.json
+          node -e "
+            const fs = require('fs');
+            let data = JSON.parse(fs.readFileSync('postman/LumaTrace_Cloud_API.postman_collection.json', 'utf8'));
+          
+            function fixItems(items) {
+              for (let i = items.length - 1; i >= 0; i--) {
+                let item = items[i];
+                if (item.item) {
+                  fixItems(item.item);
+                } else {
+                  if (item.name.includes('Logout') || item.name.includes('Register')) {
+                    items.splice(i, 1);
+                    continue;
+                  }
+          
+                  if (item.request && item.request.url && item.request.url.raw) {
+                    item.request.url.raw = item.request.url.raw.replace(/https:\/\/api\.lumatrace\.es/g, '{{base_url}}');
+                    if (Array.isArray(item.request.url.host)) {
+                       item.request.url.host = ['{{base_url}}'];
+                    }
+                  }
+          
+                  if (item.request && item.request.body && item.request.body.formdata) {
+                    item.request.body.formdata.forEach(fd => {
+                      if (fd.type === 'file') {
+                         fd.src = 'test-image.jpg'; // Forzamos a string, incluso si era un array vacio
+                      }
+                    });
+                  }
+                }
+              }
+            }
+          
+            fixItems(data.item);
+            fs.writeFileSync('postman/LumaTrace_Cloud_API.postman_collection.json', JSON.stringify(data, null, 2));
+          "
 
       - name: Start OpenAPI Mock Server (Prism)
         run: prism mock api/openapi.yaml -p 4010 > prism.log 2>&1 &
@@ -39,10 +72,9 @@ jobs:
       - name: Run Postman Collection via Newman
         run: |
           newman run postman/LumaTrace_Cloud_API.postman_collection.json \
-            --env-var "baseUrl=http://127.0.0.1:4010" \
+            --env-var "base_url=http://127.0.0.1:4010" \
             --reporters cli \
-            --working-dir . \
-            --delay-request 500
+            --working-dir .
 
       - name: Debug Prism on Failure
         if: failure()
