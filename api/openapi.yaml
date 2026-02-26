@@ -94,6 +94,7 @@ paths:
                 image:
                   type: string
                   format: binary
+                  description: "Raw image payload. Constraints: Max size 25MB, Max resolution 16 Megapixels (e.g., 4000x4000), Formats: JPEG, PNG."
                 request:
                   $ref: '#/components/schemas/PhotoRegistrationRequest'
       responses:
@@ -249,17 +250,16 @@ components:
     TooManyRequests:
       description: Rate limit exceeded.
       headers:
-        x-request-id:
-          $ref: '#/components/headers/x-request-id'
-        Retry-After:
-          description: Seconds before retry allowed.
-          schema:
-            type: integer
-            example: 30
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
+        X-RateLimit-Limit:
+          description: Request limit per window.
+          schema: { type: integer, example: 100 }
+        X-RateLimit-Remaining:
+          description: Requests remaining in the current window.
+          schema: { type: integer, example: 0 }
+        X-RateLimit-Reset:
+          description: UTC timestamp when the limit resets.
+          schema: { type: integer, example: 1708945200 }
+      content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
 
     InternalError:
       description: Unexpected server error.
