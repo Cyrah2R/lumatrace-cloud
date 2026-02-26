@@ -144,6 +144,7 @@ paths:
                 photoId:
                   type: string
                   format: uuid
+                  example: "550e8400-e29b-41d4-a716-446655440000"
       responses:
         '200':
           description: Verification completed.
@@ -279,7 +280,7 @@ components:
       properties:
         username:
           type: string
-          example: service_acct_prod
+          example: "service_acct_prod"
         password:
           type: string
           example: "••••••••"
@@ -289,7 +290,7 @@ components:
       properties:
         token:
           type: string
-          example: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+          example: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
 
     ApiError:
       type: object
@@ -297,13 +298,13 @@ components:
       properties:
         code:
           type: string
-          example: AUTH_TOKEN_EXPIRED
+          example: "AUTH_TOKEN_EXPIRED"
         message:
           type: string
-          example: The provided token is expired.
+          example: "The provided token is expired."
         traceId:
           type: string
-          example: req-f47a-c10b
+          example: "req-f47a-c10b"
 
     PhotoRegistrationRequest:
       type: object
@@ -313,12 +314,16 @@ components:
           type: string
           pattern: '^[a-fA-F0-9]{64}$'
           description: SHA-256 Hexadecimal string.
+          example: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         deviceModel:
           type: string
+          example: "Sony_Alpha_Node_1"
         latitude:
           type: number
+          example: 40.41
         longitude:
           type: number
+          example: -3.70
 
     VerificationResponse:
       type: object
@@ -331,3 +336,4 @@ components:
           example: 97.48
         message:
           type: string
+          example: "Validation successful"
