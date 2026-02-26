@@ -1,0 +1,46 @@
+name: API Contract Testing
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  contract-validation:
+    name: Newman Postman Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install Testing Tools (Newman & Prism)
+        run: npm install -g newman @stoplight/prism-cli
+
+      - name: Start OpenAPI Mock Server (Prism)
+        # Levanta un servidor falso en el puerto 4010 usando tu Swagger
+        run: prism mock api/openapi.yaml -p 4010 &
+
+      - name: Wait for Mock Server to boot
+        run: sleep 3
+
+      - name: Run Postman Collection via Newman
+        # Ejecuta la colección contra el servidor falso y genera un reporte
+        run: |
+          newman run postman/LumaTrace_Cloud_API.postman_collection.json \
+            --env-var "baseUrl=http://127.0.0.1:4010" \
+            --reporters cli,junit \
+            --reporter-junit-export contract-test-report.xml
+
+      - name: Upload Test Report Artifact
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: postman-contract-report
+          path: contract-test-report.xml
