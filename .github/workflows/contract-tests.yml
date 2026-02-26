@@ -23,6 +23,13 @@ jobs:
       - name: Install Testing Tools (Newman & Prism)
         run: npm install -g newman @stoplight/prism-cli
 
+      - name: Prepare Assets and Fix Collection
+        run: |
+          mkdir -p assets
+          echo "fake image binary content" > assets/input.jpg
+          echo "fake image binary content" > assets/protected_final.jpg
+          sed -i 's|https://api.lumatrace.es|{{baseUrl}}|g' postman/LumaTrace_Cloud_API.postman_collection.json
+
       - name: Start OpenAPI Mock Server (Prism)
         run: prism mock api/openapi.yaml -p 4010 &
 
@@ -34,7 +41,8 @@ jobs:
           newman run postman/LumaTrace_Cloud_API.postman_collection.json \
             --env-var "baseUrl=http://127.0.0.1:4010" \
             --reporters cli,junit \
-            --reporter-junit-export contract-test-report.xml
+            --reporter-junit-export contract-test-report.xml \
+            --working-dir .
 
       - name: Upload Test Report Artifact
         if: always()
