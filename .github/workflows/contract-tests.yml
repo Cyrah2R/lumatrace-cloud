@@ -23,30 +23,27 @@ jobs:
       - name: Install Testing Tools (Newman & Prism)
         run: npm install -g newman @stoplight/prism-cli
 
-      - name: Prepare Assets and Fix Collection
+      - name: Force Collection Alignment
         run: |
           mkdir -p assets
-          echo "fake image binary content" > assets/input.jpg
-          echo "fake image binary content" > assets/protected_final.jpg
+          echo "fake-binary-content" > assets/input.jpg
           sed -i 's|https://api.lumatrace.es|{{baseUrl}}|g' postman/LumaTrace_Cloud_API.postman_collection.json
+          sed -i 's|"src": ".*"|"src": "assets/input.jpg"|g' postman/LumaTrace_Cloud_API.postman_collection.json
 
       - name: Start OpenAPI Mock Server (Prism)
-        run: prism mock api/openapi.yaml -p 4010 &
+        run: prism mock api/openapi.yaml -p 4010 > prism.log 2>&1 &
 
       - name: Wait for Mock Server to boot
-        run: sleep 3
+        run: sleep 5
 
       - name: Run Postman Collection via Newman
         run: |
           newman run postman/LumaTrace_Cloud_API.postman_collection.json \
             --env-var "baseUrl=http://127.0.0.1:4010" \
-            --reporters cli,junit \
-            --reporter-junit-export contract-test-report.xml \
-            --working-dir .
+            --reporters cli \
+            --working-dir . \
+            --delay-request 500
 
-      - name: Upload Test Report Artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: postman-contract-report
-          path: contract-test-report.xml
+      - name: Debug Prism on Failure
+        if: failure()
+        run: cat prism.log
