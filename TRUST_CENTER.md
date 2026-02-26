@@ -14,6 +14,7 @@ This section centralizes public governance and security documentation for procur
 - [Security Assurance & Engineering Practices](./ASSURANCE.md)
 - [Enterprise Data Privacy Policy](./DATA_PRIVACY.md)
 - [Authorized Subprocessors & Data Residency](./SUBPROCESSORS.md)
+- [Pentest Executive Summary (Template)](./PENTEST_SUMMARY_TEMPLATE.md)
 
 ---
 
@@ -27,6 +28,7 @@ This section centralizes public governance and security documentation for procur
 
 - [Architecture & Trust Boundary Model](./ARCHITECTURE.md)
 - [API Lifecycle & Governance Policy](./API_LIFECYCLE.md)
+- [SOC2 / ISO27001 Control Mapping Matrix](./SOC2_MAPPING.md)
 
 ---
 
