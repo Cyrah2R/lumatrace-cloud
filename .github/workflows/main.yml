@@ -1,0 +1,15 @@
+name: API & Docs Validation
+
+on: [push, pull_request]
+
+jobs:
+  validate-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Validate OpenAPI Definition
+        uses: char0n/swagger-editor-validate@v1
+        with:
+          definition-file: api/openapi.yaml
+      - name: Check Documentation Links
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
