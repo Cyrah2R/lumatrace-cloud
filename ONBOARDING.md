@@ -58,11 +58,13 @@ curl -X POST "[https://api.lumatrace.es/api/v1/photos/verify](https://api.lumatr
 ```
 
 **Expected Output:**
+```bash
 {
 "authentic": true,
 "confidenceScore": 97.48,
 "tenantId": "org_enterprise_001",
 "message": "Status: [C2PA Manifest: PRESENT] [Forensic Watermark: DETECTED]"
 }
+```
 
 Congratulations! You have successfully completed the LumaTrace enterprise workflow. For automated scripts, check the /examples folder.
