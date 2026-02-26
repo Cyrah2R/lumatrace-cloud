@@ -17,7 +17,7 @@ This repository serves as the **Public Developer Portal and Trust Center** for t
 To ensure enterprise-grade reliability, we provide full transparency on our security posture:
 * **[Trust Center](./TRUST_CENTER.md):** Centralized index of all security and compliance artifacts.
 * **[Security Policy](./SECURITY.md):** Vulnerability disclosure process and security SLAs.
-* **[Data Handling](./DATA_HANDLING.md):** GDPR compliance and Zero-Retention image policy.
+* **[Data Handling](DATA_PRIVACY.md):** GDPR compliance and Zero-Retention image policy.
 * **[Public Assurance](./ASSURANCE.md):** High-level evidence of our Secure SDLC and cryptographic controls.
 
 ---

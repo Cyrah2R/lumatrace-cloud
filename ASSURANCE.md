@@ -1,16 +1,48 @@
-# Public Security Assurance & Verification
+# Public Security Assurance & Engineering Practices
 
-This document provides high-level evidence of the security controls and engineering practices mentioned in our Trust Center.
+This document provides high-level transparency into the security controls and engineering standards applied within the LumaTrace private infrastructure.
 
-## 1. Secure SDLC (Software Development Life Cycle)
-Every release of the LumaTrace private core undergoes:
-* **SAST Scanning:** Automated CodeQL analysis for SQL injection, XSS, and path traversal.
-* **Secret Scanning:** Prevention of hardcoded credentials in the supply chain.
-* **Dependency Auditing:** CycloneDX SBOM generation and Trivy vulnerability scanning.
+The intent of this document is to provide assurance to enterprise partners without exposing proprietary implementation details.
 
-## 2. Cryptographic Proofs
-* **Isolation:** Tenant isolation is enforced via Hibernate/JPA `@Filter` at the database session level, ensuring that every SQL query is automatically scoped to the `tenant_id` of the authenticated JWT.
-* **Signatures:** All C2PA manifests are signed using RSA-PSS with 3072-bit keys, anchored to our private Enterprise CA.
+---
+
+## 1. Secure Software Development Lifecycle (Secure SDLC)
+
+LumaTrace follows a security-first development lifecycle. Each private core release undergoes:
+
+- Static Application Security Testing (SAST)
+- Dependency vulnerability analysis
+- Software Bill of Materials (SBOM) generation
+- Secret scanning within CI/CD pipelines
+
+Security checks are integrated into automated build pipelines prior to release approval.
+
+---
+
+## 2. Cryptographic Controls & Tenant Isolation
+
+### Tenant Isolation
+
+All data access operations are programmatically scoped to the authenticated tenant context derived from validated JWT claims.
+
+Isolation is enforced at both:
+- Authorization layer
+- Data access layer
+
+Cross-tenant data access is structurally prevented.
+
+---
+
+### Digital Signatures
+
+C2PA manifests are signed using enterprise-grade asymmetric cryptography (RSA-PSS, 3072-bit).
+
+Private key material is securely managed and never exposed within public repositories.
+
+---
 
 ## 3. Supply Chain Integrity
-Our release artifacts are cryptographically signed. We maintain a private, redacted SBOM available for security auditors to verify our 3rd-party library footprint.
+
+Release artifacts are cryptographically signed prior to distribution.
+
+Redacted SBOM summaries may be made available to qualified enterprise security auditors under NDA for verification of third-party dependency footprint.

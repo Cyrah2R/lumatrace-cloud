@@ -1,18 +1,36 @@
 # Changelog
 
-All notable changes to the LumaTrace Cloud API and Developer Portal will be documented in this file.
+All notable changes to the LumaTrace Cloud API and Developer Portal are documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format follows Keep a Changelog principles.
+This project adheres to Semantic Versioning.
+
+---
 
 ## [1.0.0] - 2026-02-26
+
 ### Added
-- **Public Developer Portal:** Initial release of the interactive OpenAPI documentation (`openapi.yaml`).
-- **Core Endpoints:** Defined contracts for `/login`, `/logout`, `/register`, `/protect`, and `/verify`.
-- **Integration SDKs:** Added ready-to-use Python and Node.js examples for multipart payload injection.
-- **Postman Collection:** Released official B2B testing environment variables and scripts.
-- **Enterprise Trust Center:** Published `SECURITY.md`, `SUPPORT.md`, and `ARCHITECTURE.md` policies.
-- **Data Handling Policy:** Formalized Zero-Retention Image Policy for GDPR compliance.
+
+- Public Developer Portal initial release
+- Interactive OpenAPI specification (`openapi.yaml`)
+- Defined API contracts for:
+    - `/api/v1/auth/login`
+    - `/api/v1/auth/logout`
+    - `/api/v1/auth/register`
+    - `/api/v1/photos/protect`
+    - `/api/v1/photos/verify`
+- Python and Node.js integration examples
+- Official Postman collection for enterprise testing
+- Publication of governance documentation:
+    - `ARCHITECTURE.md`
+    - `SECURITY.md`
+    - `DATA_PRIVACY.md`
+    - `API_LIFECYCLE.md`
+    - `ASSURANCE.md`
 
 ### Security
-- Defined strict Multi-Tenant isolation requirements for all JWT interactions.
-- Added pre-flight validation rules (Max 25MB upload, Max 16 Megapixels) for DoS protection.
+
+- Defined strict multi-tenant isolation requirements for JWT-scoped interactions
+- Introduced pre-flight validation rules:
+    - Maximum upload size: 25MB
+    - Maximum resolution: 16 Megapixels

@@ -2,38 +2,46 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>LumaTrace API - Developer Portal</title>
-        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.css" />
+        <title>LumaTrace Enterprise API - Developer Portal</title>
+
+        <link rel="stylesheet"
+              href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.css" />
+
         <style>
-            body { margin: 0; padding: 0; font-family: sans-serif; }
-            .topbar { background-color: #1b1b1b; padding: 10px 0; }
-            .topbar-wrapper { display: flex; align-items: center; color: white; margin-left: 20px; font-weight: bold; font-size: 24px; }
+            body { margin: 0; font-family: Arial, sans-serif; }
+            .topbar {
+                background-color: #111;
+                color: #fff;
+                padding: 12px 20px;
+                font-size: 20px;
+                font-weight: bold;
+            }
         </style>
     </head>
+
     <body>
+
         <div class="topbar">
-            <div class="topbar-wrapper">
-                LumaTrace Enterprise API
-            </div>
+            LumaTrace Enterprise API Documentation
         </div>
+
         <div id="swagger-ui"></div>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui-bundle.js"></script>
+
         <script>
             window.onload = function() {
-                const ui = SwaggerUIBundle({
-                    // ESTO APUNTA A TU ARCHIVO YAML
+                SwaggerUIBundle({
                     url: "./api/openapi.yaml",
-                    dom_id: '#swagger-ui',
+                    dom_id: "#swagger-ui",
                     deepLinking: true,
-                    presets: [
-                        SwaggerUIBundle.presets.apis,
-                        SwaggerUIBundle.SwaggerUIStandalonePreset
-                    ],
+                    docExpansion: "none",
+                    defaultModelsExpandDepth: -1,
+                    displayRequestDuration: true,
                     layout: "BaseLayout"
                 });
-                window.ui = ui;
             };
         </script>
+
     </body>
 </html>

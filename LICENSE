@@ -1,7 +1,13 @@
 Copyright (c) 2026 LumaTrace Project.
 
-The documentation, OpenAPI specifications, and integration examples in this repository are
-licensed under the Creative Commons Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0).
+This repository contains documentation, OpenAPI specifications, and integration examples.
 
-The LumaTrace Core Engine and Cloud Backend are PROPRIETARY software.
-Unauthorized use, reproduction, or distribution is strictly prohibited.
+These materials are licensed under the Creative Commons Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0).
+
+You may redistribute the materials provided that:
+- Proper attribution is given
+- No modifications or derivative works are created
+
+The LumaTrace Core Engine, backend services, and internal infrastructure are proprietary software.
+
+Unauthorized use, reproduction, reverse engineering, or distribution of proprietary components is strictly prohibited.

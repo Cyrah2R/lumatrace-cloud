@@ -1,20 +1,14 @@
 {
   "info": {
     "name": "LumaTrace Cloud API (Enterprise B2B)",
-    "description": "Official Postman collection for LumaTrace Digital Watermarking and C2PA Provenance integration.\n\n**Setup:**\n1. Set the `base_url` variable to your target environment (e.g., `https://api.lumatrace.es` or `http://localhost:8081`).\n2. Run the **1. Authenticate Tenant (Login)** request. The `jwt_token` will be automatically saved and injected into all subsequent requests.",
+    "description": "Official Postman collection for LumaTrace digital asset protection and C2PA provenance verification.\n\n**Setup:**\n1. Set the `base_url` variable to your target environment (e.g., `https://api.lumatrace.es` or `http://localhost:8081`).\n2. Set your `username` and `password` for the service account.\n3. Run the **1. Authenticate Tenant (Login)** request. The `jwt_token` will be automatically saved and injected into subsequent requests.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    {
-      "key": "base_url",
-      "value": "https://api.lumatrace.es",
-      "type": "string"
-    },
-    {
-      "key": "jwt_token",
-      "value": "",
-      "type": "string"
-    }
+    { "key": "base_url", "value": "https://api.lumatrace.es", "type": "string" },
+    { "key": "jwt_token", "value": "", "type": "string" },
+    { "key": "username", "value": "", "type": "string" },
+    { "key": "password", "value": "", "type": "string" }
   ],
   "item": [
     {
@@ -39,189 +33,62 @@
           ],
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"username\": \"api_service_account\",\n    \"password\": \"secure_password_here\"\n}"
+              "raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/api/v1/auth/login",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "auth",
-                "login"
-              ]
-            }
+            "url": { "raw": "{{base_url}}/api/v1/auth/login", "host": ["{{base_url}}"], "path": ["api","v1","auth","login"] }
           }
         },
         {
           "name": "Terminate Session (Logout)",
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
-            },
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{jwt_token}}", "type": "string" } ] },
             "method": "POST",
             "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/v1/auth/logout",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "auth",
-                "logout"
-              ]
-            }
+            "url": { "raw": "{{base_url}}/api/v1/auth/logout", "host": ["{{base_url}}"], "path": ["api","v1","auth","logout"] }
           }
         }
       ]
     },
     {
-      "name": "2. Core Workflows (Protect & Verify)",
+      "name": "2. Core Workflows",
       "item": [
-        {
-          "name": "Register Metadata Only (Legacy)",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"contentHash\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\n  \"deviceModel\": \"Enterprise_Capture_Node_A1\",\n  \"latitude\": 40.4168,\n  \"longitude\": -3.7038\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/v1/photos/register",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "photos",
-                "register"
-              ]
-            }
-          }
-        },
         {
           "name": "Full C2PA Protection (Soft-Binding)",
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
-            },
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{jwt_token}}", "type": "string" } ] },
             "method": "POST",
             "header": [],
             "body": {
               "mode": "formdata",
               "formdata": [
-                {
-                  "key": "image",
-                  "type": "file",
-                  "src": []
-                },
-                {
-                  "key": "request",
-                  "value": "{\n  \"contentHash\": \"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\",\n  \"deviceModel\": \"Enterprise_Capture_Node_A1\",\n  \"latitude\": 40.4168,\n  \"longitude\": -3.7038\n}",
-                  "type": "text",
-                  "contentType": "application/json"
-                }
+                { "key": "image", "type": "file", "src": [] },
+                { "key": "request", "value": "{ \"contentHash\": \"YOUR_SHA256_HASH\" }", "type": "text", "contentType": "application/json" }
               ]
             },
-            "url": {
-              "raw": "{{base_url}}/api/v1/photos/protect",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "photos",
-                "protect"
-              ]
-            }
+            "url": { "raw": "{{base_url}}/api/v1/photos/protect", "host": ["{{base_url}}"], "path": ["api","v1","photos","protect"] }
           }
         },
         {
           "name": "Dual-Path Verification",
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{jwt_token}}",
-                  "type": "string"
-                }
-              ]
-            },
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{jwt_token}}", "type": "string" } ] },
             "method": "POST",
             "header": [],
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "image",
-                  "type": "file",
-                  "src": []
-                },
-                {
-                  "key": "photoId",
-                  "value": "YOUR_UUID_HERE",
-                  "type": "text"
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{base_url}}/api/v1/photos/verify",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "photos",
-                "verify"
-              ]
-            }
+            "body": { "mode": "formdata", "formdata": [ { "key": "image", "type": "file", "src": [] }, { "key": "photoId", "value": "YOUR_UUID_HERE", "type": "text" } ] },
+            "url": { "raw": "{{base_url}}/api/v1/photos/verify", "host": ["{{base_url}}"], "path": ["api","v1","photos","verify"] }
+          }
+        },
+        {
+          "name": "Register Metadata Only (Deprecated - Optional Flow)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{jwt_token}}", "type": "string" } ] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"contentHash\": \"YOUR_SHA256_HASH\",\n  \"deviceModel\": \"Enterprise_Capture_Node_A1\",\n  \"latitude\": 40.4168,\n  \"longitude\": -3.7038\n}" },
+            "url": { "raw": "{{base_url}}/api/v1/photos/register", "host": ["{{base_url}}"], "path": ["api","v1","photos","register"] }
           }
         }
       ]

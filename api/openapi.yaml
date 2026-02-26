@@ -3,8 +3,18 @@ info:
   title: LumaTrace Cloud API
   description: |
     Enterprise API for LumaTrace Digital Watermarking and C2PA Provenance.
-    Spatial watermarking and C2PA JUMBF orchestration within a multi-tenant, zero-trust framework.
-  version: 1.0.0
+
+    Operational Guarantees:
+    - All responses include `x-request-id` for traceability.
+    - Write operations support `Idempotency-Key`.
+    - Deterministic machine-readable error codes.
+    - JWT tokens are short-lived (15m default).
+    - Rate limiting enforced per tenant.
+
+    SLA Targets (Production):
+    - Availability: 99.9%
+    - P95 latency: < 800ms (verification)
+  version: 1.1.0
   contact:
     name: LumaTrace Enterprise Support
     email: enterprise@lumatrace.es
@@ -14,9 +24,9 @@ info:
 
 servers:
   - url: https://api.lumatrace.es
-    description: Production Environment
+    description: Production
   - url: https://sandbox.api.lumatrace.es
-    description: Sandbox Environment
+    description: Sandbox
   - url: http://127.0.0.1:8081
     description: Local Development
 
@@ -24,10 +34,19 @@ security:
   - bearerAuth: []
 
 paths:
+
   /api/v1/auth/login:
     post:
       operationId: loginTenant
-      summary: Authenticate Tenant Session
+      summary: Authenticate Service Account
+      description: |
+        Authenticates a tenant-scoped service account.
+
+        Token characteristics:
+        - JWT RS256 signed
+        - 15 minute expiration
+        - Non-refreshable
+        - Must be re-issued via login endpoint
       tags: ["Identity & Access"]
       security: []
       requestBody:
@@ -35,31 +54,35 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required: [username, password]
-              properties:
-                username: { type: string, example: "service_acct_prod" }
-                password: { type: string, example: "••••••••" }
+              $ref: '#/components/schemas/LoginRequest'
       responses:
         '200':
-          description: Session created. Returns a short-lived JWT.
+          description: Authentication successful.
           headers:
-            x-request-id: { $ref: '#/components/headers/x-request-id' }
+            x-request-id:
+              $ref: '#/components/headers/x-request-id'
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  token: { type: string, example: "eyJhbG..." }
-        '401': { $ref: '#/components/responses/Unauthorized' }
-        '429': { $ref: '#/components/responses/TooManyRequests' }
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
 
   /api/v1/photos/protect:
     post:
       operationId: protectAsset
       summary: Full C2PA & Watermark Protection
-      description: Injects spatial signal and signs C2PA manifest.
+      description: |
+        Injects spatial watermark signal and signs C2PA manifest.
+
+        Idempotency:
+        - Clients SHOULD provide `Idempotency-Key`.
+        - Same key within 24h returns same result.
       tags: ["Provenance"]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -68,22 +91,43 @@ paths:
               type: object
               required: [image, request]
               properties:
-                image: { type: string, format: binary }
-                request: { $ref: '#/components/schemas/PhotoRegistrationRequest' }
+                image:
+                  type: string
+                  format: binary
+                request:
+                  $ref: '#/components/schemas/PhotoRegistrationRequest'
       responses:
         '200':
           description: Protected binary asset.
+          headers:
+            x-request-id:
+              $ref: '#/components/headers/x-request-id'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
           content:
-            image/jpeg: { schema: { type: string, format: binary } }
-        '400': { $ref: '#/components/responses/BadRequest' }
-        '401': { $ref: '#/components/responses/Unauthorized' }
-        '413': { $ref: '#/components/responses/PayloadTooLarge' }
-        '500': { $ref: '#/components/responses/InternalError' }
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
 
   /api/v1/photos/verify:
     post:
       operationId: verifyAsset
       summary: Dual-Path Verification
+      description: |
+        Performs spatial watermark detection and C2PA manifest validation.
       tags: ["Forensic Verification"]
       requestBody:
         required: true
@@ -93,55 +137,173 @@ paths:
               type: object
               required: [image, photoId]
               properties:
-                image: { type: string, format: binary }
-                photoId: { type: string, format: uuid, example: "550e8400-e29b-41d4-a716-446655440000" }
+                image:
+                  type: string
+                  format: binary
+                photoId:
+                  type: string
+                  format: uuid
       responses:
         '200':
-          description: Verification success.
+          description: Verification completed.
+          headers:
+            x-request-id:
+              $ref: '#/components/headers/x-request-id'
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/VerificationResponse' }
-        '404': { $ref: '#/components/responses/NotFound' }
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalError'
 
 components:
+
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
 
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      description: Unique key to prevent duplicate processing.
+      schema:
+        type: string
+        maxLength: 64
+        example: "8c3f2d8b-21fa-4c9b-a3b1-req123"
+
   headers:
     x-request-id:
-      description: Unique correlation ID for support.
-      schema: { type: string, example: "req-7b2a-f47a-c10b" }
+      description: Unique correlation ID. Required in all responses.
+      schema:
+        type: string
+        example: "req-7b2a-f47a-c10b"
+
+    X-RateLimit-Remaining:
+      description: Remaining requests in current window.
+      schema:
+        type: integer
+        example: 94
 
   responses:
+
     BadRequest:
       description: Malformed request.
-      content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
+      headers:
+        x-request-id:
+          $ref: '#/components/headers/x-request-id'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+
     Unauthorized:
-      description: Invalid JWT.
-      content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
+      description: Invalid or expired JWT.
+      headers:
+        x-request-id:
+          $ref: '#/components/headers/x-request-id'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+
+    Forbidden:
+      description: Tenant not authorized for operation.
+      headers:
+        x-request-id:
+          $ref: '#/components/headers/x-request-id'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+
     NotFound:
       description: Asset not found.
-      content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
+      headers:
+        x-request-id:
+          $ref: '#/components/headers/x-request-id'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+
     PayloadTooLarge:
-      description: File exceeds limit.
-      content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
+      description: File exceeds maximum size (20MB).
+      headers:
+        x-request-id:
+          $ref: '#/components/headers/x-request-id'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+
     TooManyRequests:
       description: Rate limit exceeded.
-      content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
+      headers:
+        x-request-id:
+          $ref: '#/components/headers/x-request-id'
+        Retry-After:
+          description: Seconds before retry allowed.
+          schema:
+            type: integer
+            example: 30
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+
     InternalError:
-      description: Server-side failure.
-      content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
+      description: Unexpected server error.
+      headers:
+        x-request-id:
+          $ref: '#/components/headers/x-request-id'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
 
   schemas:
-    ApiError:
+
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          example: service_acct_prod
+        password:
+          type: string
+          example: "••••••••"
+
+    LoginResponse:
       type: object
       properties:
-        code: { type: string, example: "AUTH_TOKEN_EXPIRED" }
-        message: { type: string, example: "The provided token is no longer valid." }
-        traceId: { type: string, example: "req-f47a-c10b" }
+        token:
+          type: string
+          example: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+
+    ApiError:
+      type: object
+      required: [code, message, traceId]
+      properties:
+        code:
+          type: string
+          example: AUTH_TOKEN_EXPIRED
+        message:
+          type: string
+          example: The provided token is expired.
+        traceId:
+          type: string
+          example: req-f47a-c10b
 
     PhotoRegistrationRequest:
       type: object
@@ -151,14 +313,21 @@ components:
           type: string
           pattern: '^[a-fA-F0-9]{64}$'
           description: SHA-256 Hexadecimal string.
-          example: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-        deviceModel: { type: string, example: "Sony_Alpha_Node_1" }
-        latitude: { type: number, example: 40.41 }
-        longitude: { type: number, example: -3.70 }
+        deviceModel:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
 
     VerificationResponse:
       type: object
       properties:
-        authentic: { type: boolean, example: true }
-        confidenceScore: { type: number, example: 97.48 }
-        message: { type: string, example: "Signal detected with high confidence." }
+        authentic:
+          type: boolean
+          example: true
+        confidenceScore:
+          type: number
+          example: 97.48
+        message:
+          type: string

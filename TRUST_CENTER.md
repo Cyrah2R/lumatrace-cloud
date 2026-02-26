@@ -1,17 +1,28 @@
 # LumaTrace Enterprise Trust Center
 
-Welcome to the LumaTrace Trust Center. Transparency and security are built into the core of our B2B forensic architecture.
+Welcome to the LumaTrace Trust Center.
 
-For Enterprise Due Diligence, Procurement, and Architecture Review boards, please refer to the following public operational and governance artifacts:
+Transparency, security, and structural isolation are foundational to our enterprise architecture.
 
-## Security & Privacy
-* **[Vulnerability Disclosure & Security Policy](./SECURITY.md)**: SLAs, reporting channels, and support matrix.
-* **[Enterprise Data Handling Policy](./DATA_HANDLING.md)**: GDPR compliance, zero-retention image processing, and AES-256 at-rest encryption details.
-
-## Architecture & Operations
-* **[Shared Responsibility Model](./ARCHITECTURE.md)**: Details our air-gapped core algorithms and public/private repository boundaries.
-* **[API Lifecycle & Governance](./SUPPORT.md)**: Versioning strictness (SemVer), rate-limiting (Token-Bucket), deprecation windows, and the standard Error Catalog.
+This section centralizes public governance and security documentation for procurement, compliance, and InfoSec review processes.
 
 ---
-**Note for Procurement & InfoSec Teams:**
-Deep technical artifacts, including the STRIDE Threat Model, SOC2 Control Mappings, CycloneDX SBOMs, and Pentest Summaries, are maintained internally. They are available for review under a standard Non-Disclosure Agreement (NDA). Please contact `contact@lumatrace.es` to initiate a Vendor Risk Assessment.
+
+## Security & Privacy
+
+- [Security Policy](./SECURITY.md)
+- [Security Assurance & Engineering Practices](./ASSURANCE.md)
+- [Enterprise Data Privacy Policy](./DATA_PRIVACY.md)
+
+---
+
+## Architecture & Governance
+
+- [Architecture & Trust Boundary Model](./ARCHITECTURE.md)
+- [API Lifecycle & Governance Policy](./API_LIFECYCLE.md)
+
+---
+
+## Additional Enterprise Artifacts
+
+Additional technical artifacts (e.g., STRIDE threat models, SBOM summaries, internal control mappings) may be shared under NDA with qualified enterprise security reviewers upon request.
