@@ -148,7 +148,8 @@ paths:
                   format: binary
                   description: "Raw image payload. Constraints: Max size 25MB, Max Resolution 16MP (JPEG/PNG/WEBP)."
                 request:
-                  $ref: '#/components/schemas/PhotoRegistrationRequest'
+                  type: string
+                  description: "Stringified JSON payload matching the PhotoRegistrationRequest schema."
       responses:
         '200':
           description: Protected binary asset.
