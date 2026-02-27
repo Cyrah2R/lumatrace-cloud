@@ -24,8 +24,10 @@ jobs:
         run: npm install -g newman @stoplight/prism-cli @stoplight/spectral-cli
 
       - name: Lint OpenAPI Specification (Contract Quality)
-        # Eliminamos las comillas para que Spectral use su ruleset interno 'oas'
-        run: spectral lint api/openapi.yaml -r spectral:oas
+        # Creamos el archivo de reglas físicamente para que Spectral lo lea sin problemas
+        run: |
+          echo 'extends: ["spectral:oas"]' > .spectral.yaml
+          spectral lint api/openapi.yaml --ruleset=.spectral.yaml
 
       - name: Prepare Workspace and Clean Collection
         run: |
@@ -64,7 +66,6 @@ jobs:
           "
 
       - name: Start OpenAPI Mock Server (Prism)
-        # Aseguramos la creación del archivo de log para evitar errores de 'cat'
         run: |
           touch prism.log
           prism mock api/openapi.yaml -p 4010 > prism.log 2>&1 &
