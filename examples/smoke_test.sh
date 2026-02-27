@@ -18,7 +18,13 @@ else
     exit 1
 fi
 
-echo "[*] Phase 2: System Health Check (OpenAPI Schema)"
-curl -I -s "$API_BASE/v1/photos/verify" -H "Authorization: Bearer $TOKEN" | grep "HTTP"
+echo "[*] Phase 2: System Health Check & Session Teardown"
+HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$API_BASE/v1/auth/logout" \
+     -H "Authorization: Bearer $TOKEN")
 
-echo "[+] Smoke test completed successfully."
+if [ "$HTTP_STATUS" == "200" ]; then
+    echo "[+] Smoke test completed successfully. Clean teardown (HTTP $HTTP_STATUS)."
+else
+    echo "[!] Smoke test failed during teardown (HTTP $HTTP_STATUS)."
+    exit 1
+fi
