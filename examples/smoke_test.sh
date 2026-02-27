@@ -7,7 +7,7 @@ USER=$2
 PASS=$3
 
 echo "[*] Phase 1: Authentication Check"
-TOKEN=$(curl -s -X POST "$API_BASE/v1/auth/login" \
+TOKEN=$(curl -s -X POST "$API_BASE/api/v1/auth/login" \
      -H "Content-Type: application/json" \
      -d "{\"username\":\"$USER\",\"password\":\"$PASS\"}" | jq -r '.token')
 
@@ -19,7 +19,7 @@ else
 fi
 
 echo "[*] Phase 2: System Health Check & Session Teardown"
-HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$API_BASE/v1/auth/logout" \
+HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$API_BASE/api/v1/auth/logout" \
      -H "Authorization: Bearer $TOKEN")
 
 if [ "$HTTP_STATUS" == "200" ]; then
