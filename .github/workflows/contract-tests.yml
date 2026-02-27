@@ -8,7 +8,7 @@ on:
 
 jobs:
   contract-validation:
-    name: Newman Postman Tests
+    name: Newman Postman Tests & Linting
     runs-on: ubuntu-latest
 
     steps:
@@ -20,8 +20,11 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install Testing Tools (Newman & Prism)
-        run: npm install -g newman @stoplight/prism-cli
+      - name: Install Testing Tools (Newman, Prism & Spectral)
+        run: npm install -g newman @stoplight/prism-cli @stoplight/spectral-cli
+
+      - name: Lint OpenAPI Specification (Contract Quality)
+        run: spectral lint api/openapi.yaml --ruleset "spectral:oas"
 
       - name: Prepare Workspace and Clean Collection
         run: |

@@ -27,11 +27,9 @@ It is limited to API contracts and integration guidance only.
 
 The production infrastructure is maintained in private, access-controlled repositories:
 
-**lumatrace-core**  
-A proprietary, framework-independent forensic engine implementing psycho-visual watermarking and detection mechanisms.
+**lumatrace-core** A proprietary, framework-independent forensic engine implementing psycho-visual watermarking and detection mechanisms.
 
-**lumatrace-server**  
-A backend orchestration service responsible for:
+**lumatrace-server** A backend orchestration service responsible for:
 - Tenant-aware authentication and authorization
 - Scoped persistence
 - C2PA manifest injection workflows
@@ -74,6 +72,6 @@ To mitigate denial-of-service and resource exhaustion vectors:
 
 - Maximum file size enforced before processing
 - Maximum image resolution (16 Megapixels)
-- Supported formats: JPEG and PNG
+- Supported formats: JPEG, PNG, and WEBP
 
 Validation occurs prior to loading payloads into memory buffers.
