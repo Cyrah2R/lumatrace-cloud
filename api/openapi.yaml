@@ -4,14 +4,20 @@ info:
   description: |
     Enterprise API for LumaTrace Digital Watermarking and C2PA Provenance.
 
-    Operational Guarantees:
+    **Operational Guarantees & Limits:**
+    - **Max Payload Size:** 25 MB
+    - **Max Resolution:** 16 Megapixels (e.g., 4000x4000px)
+    - **Supported Formats:** `image/jpeg`, `image/png`, `image/webp`
     - All responses include `x-request-id` for traceability.
-    - Write operations support `Idempotency-Key`.
-    - Deterministic machine-readable error codes.
-    - JWT tokens are short-lived (15m default).
+    - Write operations (`/register`, `/protect`) support `Idempotency-Key`.
+    - Deterministic machine-readable error codes (see ApiError schema).
     - Rate limiting enforced per tenant.
 
-    SLA Targets (Production):
+    **Authentication Profile (M2M):**
+    - Machine-to-Machine (M2M) Service Account flows.
+    - JWT tokens are short-lived RS256 signatures (15m default expiration).
+
+    **SLA Targets (Production):**
     - Availability: 99.9%
     - P95 latency: < 800ms (verification)
   version: 1.1.0
@@ -38,8 +44,10 @@ paths:
   /api/v1/auth/login:
     post:
       operationId: loginTenant
-      summary: Authenticate Service Account
-      description: Validates credentials and returns a signed JWT.
+      summary: Authenticate Service Account (M2M)
+      description: |
+        Validates M2M credentials and returns a signed short-lived JWT. 
+        This is a Machine-to-Machine flow; the returned token enforces tenant isolation and API quotas.
       tags: ["Identity & Access"]
       security: []
       requestBody:
@@ -92,8 +100,10 @@ paths:
     post:
       operationId: registerMetadata
       summary: Register Asset Metadata
-      description: Registers forensic metadata returning a PhotoRegistrationResponse.
+      description: Registers forensic metadata returning a PhotoRegistrationResponse. Must be called prior to protection if separating flows.
       tags: ["Provenance"]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
         content:
@@ -121,7 +131,7 @@ paths:
     post:
       operationId: protectAsset
       summary: Full C2PA & Watermark Protection
-      description: Injects spatial watermark signal and signs C2PA manifest.
+      description: Injects spatial watermark signal and signs C2PA manifest. Enforces 25MB payload and 16MP resolution limits.
       tags: ["Provenance"]
       parameters:
         - $ref: '#/components/parameters/IdempotencyKey'
@@ -136,7 +146,7 @@ paths:
                 image:
                   type: string
                   format: binary
-                  description: "Raw image payload. Constraints: Max size 25MB."
+                  description: "Raw image payload. Constraints: Max size 25MB, Max Resolution 16MP (JPEG/PNG/WEBP)."
                 request:
                   $ref: '#/components/schemas/PhotoRegistrationRequest'
       responses:
@@ -169,7 +179,7 @@ paths:
     post:
       operationId: verifyAsset
       summary: Dual-Path Verification
-      description: Performs spatial watermark detection and C2PA manifest validation.
+      description: Performs spatial watermark detection and C2PA manifest validation. Returns automated policy decisions for SIEM/SOC ingestion.
       tags: ["Forensic Verification"]
       requestBody:
         required: true
@@ -222,7 +232,7 @@ components:
       name: Idempotency-Key
       in: header
       required: false
-      description: Unique key to prevent duplicate processing.
+      description: Unique key to prevent duplicate processing for state-mutating requests.
       schema:
         type: string
         maxLength: 64
@@ -244,7 +254,7 @@ components:
   responses:
 
     BadRequest:
-      description: Malformed request.
+      description: Malformed request or validation failure.
       headers:
         x-request-id:
           $ref: '#/components/headers/x-request-id'
@@ -254,7 +264,7 @@ components:
             $ref: '#/components/schemas/ApiError'
 
     Unauthorized:
-      description: Invalid or expired JWT.
+      description: Invalid, missing, or expired JWT.
       headers:
         x-request-id:
           $ref: '#/components/headers/x-request-id'
@@ -274,7 +284,7 @@ components:
             $ref: '#/components/schemas/ApiError'
 
     NotFound:
-      description: Asset not found.
+      description: Asset or resource not found.
       headers:
         x-request-id:
           $ref: '#/components/headers/x-request-id'
@@ -284,7 +294,7 @@ components:
             $ref: '#/components/schemas/ApiError'
 
     PayloadTooLarge:
-      description: File exceeds maximum size (25MB).
+      description: File exceeds maximum size limits (25MB) or 16MP resolution.
       headers:
         x-request-id:
           $ref: '#/components/headers/x-request-id'
@@ -294,7 +304,7 @@ components:
             $ref: '#/components/schemas/ApiError'
 
     TooManyRequests:
-      description: Rate limit exceeded.
+      description: Rate limit exceeded for the tenant.
       headers:
         X-RateLimit-Limit:
           description: Request limit per window.
@@ -325,9 +335,11 @@ components:
       properties:
         username:
           type: string
+          description: Service Account identifier.
           example: "service_acct_prod"
         password:
           type: string
+          description: Service Account secret.
           example: "••••••••"
 
     LoginResponse:
@@ -335,6 +347,7 @@ components:
       properties:
         token:
           type: string
+          description: RS256 signed JWT representing the M2M session.
           example: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
 
     PhotoRegistrationRequest:
@@ -344,7 +357,7 @@ components:
         contentHash:
           type: string
           pattern: '^[a-fA-F0-9]{64}$'
-          description: SHA-256 Hexadecimal string.
+          description: SHA-256 Hexadecimal string of the asset.
           example: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         deviceModel:
           type: string
@@ -365,6 +378,7 @@ components:
           example: "550e8400-e29b-41d4-a716-446655440000"
         tenantId:
           type: string
+          description: Contextual Tenant ID derived from the session (For debug/correlation).
           example: "tenant_alpha_01"
         signature:
           type: string
@@ -375,10 +389,27 @@ components:
       properties:
         authentic:
           type: boolean
+          description: Top-level boolean determining if the asset passes baseline authenticity checks.
           example: true
         confidenceScore:
           type: number
+          description: Z-Score (σ) of the spatial watermark signal.
           example: 97.48
+        c2paStatus:
+          type: string
+          enum: [VALID, INVALID, MISSING, TAMPERED]
+          description: State of the hard-bound C2PA manifest.
+          example: "VALID"
+        watermarkStatus:
+          type: string
+          enum: [DETECTED, MARGINAL, NOT_FOUND]
+          description: State of the soft-bound spatial signal.
+          example: "DETECTED"
+        tamperClass:
+          type: string
+          enum: [NONE, COMPRESSION, RESIZE, CROP, STRUCTURAL_ALTERATION]
+          description: Estimated class of degradation if tampering occurred.
+          example: "NONE"
         tenantId:
           type: string
           example: "tenant_alpha_01"
@@ -392,10 +423,25 @@ components:
       properties:
         code:
           type: string
-          example: "AUTH_TOKEN_EXPIRED"
+          description: |
+            Standardized Enterprise Catalog Codes:
+            - `VALIDATION_FAILED`: Payload violates schema or limits (e.g., >16MP).
+            - `AUTH_MISSING`: No bearer token provided.
+            - `AUTH_EXPIRED`: JWT TTL exceeded.
+            - `TENANT_RESTRICTED`: Operation not allowed for current M2M scopes.
+            - `PAYLOAD_TOO_LARGE`: Binary exceeds 25MB hard limit.
+            - `RATE_LIMIT_EXCEEDED`: Tenant bucket exhausted.
+            - `INTERNAL_ENGINE_ERROR`: DSP or PKI signing failure.
+          example: "AUTH_EXPIRED"
         message:
           type: string
+          description: Human-readable context for the specific error instance.
           example: "The provided token is expired."
+        action:
+          type: string
+          description: Suggested automated remediation step for the client system.
+          example: "Request a new token via /api/v1/auth/login"
         traceId:
           type: string
+          description: Correlation ID tying back to the x-request-id header.
           example: "req-f47a-c10b"
