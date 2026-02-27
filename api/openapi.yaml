@@ -306,6 +306,8 @@ components:
     TooManyRequests:
       description: Rate limit exceeded for the tenant.
       headers:
+        x-request-id:
+          $ref: '#/components/headers/x-request-id'
         X-RateLimit-Limit:
           description: Request limit per window.
           schema: { type: integer, example: 100 }
