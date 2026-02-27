@@ -21,6 +21,9 @@
               "listen": "test",
               "script": {
                 "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
                   "var jsonData = pm.response.json();",
                   "if (jsonData.token) {",
                   "    pm.collectionVariables.set(\"jwt_token\", jsonData.token);",
@@ -43,6 +46,19 @@
         },
         {
           "name": "Terminate Session (Logout)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{jwt_token}}", "type": "string" } ] },
             "method": "POST",
@@ -57,6 +73,19 @@
       "item": [
         {
           "name": "Full C2PA Protection (Soft-Binding)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{jwt_token}}", "type": "string" } ] },
             "method": "POST",
@@ -75,16 +104,42 @@
         },
         {
           "name": "Dual-Path Verification",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{jwt_token}}", "type": "string" } ] },
             "method": "POST",
             "header": [],
-            "body": { "mode": "formdata", "formdata": [ { "key": "image", "type": "file", "src": [] }, { "key": "photoId", "value": "YOUR_UUID_HERE", "type": "text" } ] },
+            "body": { "mode": "formdata", "formdata": [ { "key": "image", "type": "file", "src": [] }, { "key": "photoId", "value": "550e8400-e29b-41d4-a716-446655440000", "type": "text" } ] },
             "url": { "raw": "{{base_url}}/api/v1/photos/verify", "host": ["{{base_url}}"], "path": ["api","v1","photos","verify"] }
           }
         },
         {
           "name": "Register Metadata (Pre-Protection)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "auth": { "type": "bearer", "bearer": [ { "key": "token", "value": "{{jwt_token}}", "type": "string" } ] },
             "method": "POST",
