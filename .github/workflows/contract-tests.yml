@@ -13,10 +13,10 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
@@ -24,7 +24,8 @@ jobs:
         run: npm install -g newman @stoplight/prism-cli @stoplight/spectral-cli
 
       - name: Lint OpenAPI Specification (Contract Quality)
-        run: spectral lint api/openapi.yaml --ruleset "spectral:oas"
+        # Eliminamos las comillas para que Spectral use su ruleset interno 'oas'
+        run: spectral lint api/openapi.yaml -r spectral:oas
 
       - name: Prepare Workspace and Clean Collection
         run: |
@@ -50,7 +51,7 @@ jobs:
                   if (item.request && item.request.body && item.request.body.formdata) {
                     item.request.body.formdata.forEach(fd => {
                       if (fd.type === 'file') {
-                         fd.src = 'test-image.jpg'; // Forzamos a string, incluso si era un array vacio
+                         fd.src = 'test-image.jpg'; 
                       }
                     });
                   }
@@ -63,10 +64,13 @@ jobs:
           "
 
       - name: Start OpenAPI Mock Server (Prism)
-        run: prism mock api/openapi.yaml -p 4010 > prism.log 2>&1 &
+        # Aseguramos la creación del archivo de log para evitar errores de 'cat'
+        run: |
+          touch prism.log
+          prism mock api/openapi.yaml -p 4010 > prism.log 2>&1 &
 
       - name: Wait for Mock Server to boot
-        run: sleep 5
+        run: sleep 8
 
       - name: Run Postman Collection via Newman
         run: |
@@ -79,4 +83,4 @@ jobs:
         if: failure()
         run: |
           echo "--- PRISM LOGS ---"
-          cat prism.log
+          [ -f prism.log ] && cat prism.log || echo "Prism log file not found."
