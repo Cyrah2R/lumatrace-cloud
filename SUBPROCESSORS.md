@@ -10,4 +10,4 @@ To comply with the General Data Protection Regulation (GDPR) and Enterprise Data
 | **Redis Enterprise**          | Distributed Session Blocklist & Rate Limiting | EU-West-3 (Paris)                            | SOC2, ISO27001       |
 | **PostgreSQL (Managed)**      | Encrypted Metadata Persistence                | EU-West-3 (Paris)                            | SOC2, ISO27001       |
 
-*Note: As per our `DATA_HANDLING.md` policy, image binaries are strictly processed in-memory and are never written to disk or sent to third-party sub-processors.*
+*Note: As per our [Enterprise Data Privacy Policy](./DATA_PRIVACY.md), image binaries are strictly processed in-memory and are never written to disk or sent to third-party sub-processors.*

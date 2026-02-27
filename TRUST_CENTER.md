@@ -15,12 +15,14 @@ This section centralizes public governance and security documentation for procur
 - [Enterprise Data Privacy Policy](./DATA_PRIVACY.md)
 - [Authorized Subprocessors & Data Residency](./SUBPROCESSORS.md)
 - [Pentest Executive Summary (Template)](./PENTEST_SUMMARY_TEMPLATE.md)
+- [Public Evidence Pack Summary](./EVIDENCE_PACK_SUMMARY.md)
 
 ---
 
 ## Operations & Reliability
 
 - [Service Level Agreement (SLA) & Incident Response](./SLA_AND_INCIDENTS.md)
+- [Enterprise Quick Validation Kit (Smoke Test)](./examples/smoke_test.sh)
 
 ---
 
