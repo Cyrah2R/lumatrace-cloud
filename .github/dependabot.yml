@@ -7,3 +7,11 @@ updates:
     labels:
       - "security"
       - "dependencies"
+
+  - package-ecosystem: "npm"
+    directory: "/examples"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "security"
+      - "dependencies"

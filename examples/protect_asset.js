@@ -13,9 +13,18 @@ const crypto = require('crypto');
 
 // --- Configuration ---
 const API_BASE_URL = 'https://api.lumatrace.es/api/v1';
-const USERNAME = 'your_service_account';
-const PASSWORD = 'your_secure_password';
+
+// [AUDIT FIX]: Credentials must be loaded from a secure Vault or Environment Variables in production.
+// Never hardcode credentials in source code.
+const USERNAME = process.env.LUMATRACE_USERNAME;
+const PASSWORD = process.env.LUMATRACE_PASSWORD;
 const IMAGE_PATH = './sample_input.jpg';
+
+if (!USERNAME || !PASSWORD) {
+    console.error('[!] Error: LUMATRACE_USERNAME and LUMATRACE_PASSWORD environment variables must be set.');
+    console.error('    Usage: LUMATRACE_USERNAME=myUser LUMATRACE_PASSWORD=myPass node protect_asset.js');
+    process.exit(1);
+}
 
 function getSha256Hash(filePath) {
     const fileBuffer = fs.readFileSync(filePath);

@@ -41,6 +41,29 @@ security:
 
 paths:
 
+  /api/v1/health:
+    get:
+      operationId: checkHealth
+      summary: System Health Check
+      description: Lightweight endpoint for load balancers and DevOps monitoring to verify service liveness.
+      tags: ["Operations"]
+      security: []
+      responses:
+        '200':
+          description: System is healthy and accepting traffic.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "UP"
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: "2026-03-13T10:00:00Z"
+
   /api/v1/auth/login:
     post:
       operationId: loginTenant
@@ -352,6 +375,10 @@ components:
           type: string
           description: RS256 signed JWT representing the M2M session.
           example: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+        expires_in:
+          type: integer
+          description: Time-to-Live (TTL) of the token in seconds.
+          example: 900
 
     PhotoRegistrationRequest:
       type: object
