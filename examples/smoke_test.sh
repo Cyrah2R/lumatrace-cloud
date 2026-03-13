@@ -4,7 +4,6 @@
 
 API_BASE=${1:-"https://api.lumatrace.es"}
 
-# [AUDIT FIX]: Reading credentials from environment variables prevents exposure in OS process lists (ps aux).
 USER=${LUMATRACE_USERNAME}
 PASS=${LUMATRACE_PASSWORD}
 

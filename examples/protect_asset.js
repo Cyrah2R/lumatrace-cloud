@@ -14,8 +14,6 @@ const crypto = require('crypto');
 // --- Configuration ---
 const API_BASE_URL = 'https://api.lumatrace.es/api/v1';
 
-// [AUDIT FIX]: Credentials must be loaded from a secure Vault or Environment Variables in production.
-// Never hardcode credentials in source code.
 const USERNAME = process.env.LUMATRACE_USERNAME;
 const PASSWORD = process.env.LUMATRACE_PASSWORD;
 const IMAGE_PATH = './sample_input.jpg';
