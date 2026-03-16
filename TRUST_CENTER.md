@@ -16,6 +16,7 @@ This section centralizes public governance and security documentation for procur
 - [Authorized Subprocessors & Data Residency](./SUBPROCESSORS.md)
 - [Pentest Executive Summary (Template)](./PENTEST_SUMMARY_TEMPLATE.md)
 - [Public Evidence Pack Summary](./EVIDENCE_PACK_SUMMARY.md)
+- [Public Evidence Index](./PUBLIC_EVIDENCE_INDEX.md)
 
 ---
 

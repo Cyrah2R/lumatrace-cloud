@@ -20,7 +20,7 @@ info:
     **SLA Targets (Production):**
     - Availability: 99.9%
     - P95 latency: < 800ms (verification)
-  version: 1.1.0
+  version: 1.2.0
   contact:
     name: LumaTrace Enterprise Support
     email: enterprise@lumatrace.es
@@ -69,8 +69,12 @@ paths:
       operationId: loginTenant
       summary: Authenticate Service Account (M2M)
       description: |
-        Validates M2M credentials and returns a signed short-lived JWT. 
+        Validates M2M credentials and returns a signed short-lived JWT.
         This is a Machine-to-Machine flow; the returned token enforces tenant isolation and API quotas.
+
+        **Multi-tenant authentication:** the `tenantId` field is required to scope the
+        authentication to a specific organizational boundary. Two tenants may share the same
+        `username` — the system resolves the identity exclusively within the declared tenant.
       tags: ["Identity & Access"]
       security: []
       requestBody:
@@ -154,7 +158,23 @@ paths:
     post:
       operationId: protectAsset
       summary: Full C2PA & Watermark Protection
-      description: Injects spatial watermark signal and signs C2PA manifest. Enforces 25MB payload and 16MP resolution limits.
+      description: |
+        Injects a spatial spread-spectrum watermark and signs a C2PA JUMBF manifest
+        into the submitted image asset.
+
+        **Output format:** This endpoint **always returns `image/jpeg`** regardless
+        of the input format (JPEG, PNG, or WEBP). The protected asset undergoes an
+        RGB conversion and JPEG re-encoding at quality 0.95 as part of the watermark
+        injection pipeline. Clients must not assume the output format matches the
+        input format.
+
+        **Operational limits:**
+        - Maximum payload: 25 MB
+        - Maximum resolution: 16 Megapixels (e.g. 4000×4000 px)
+        - Supported input formats: `image/jpeg`, `image/png`, `image/webp`
+
+        **Idempotency:** supported via `Idempotency-Key` header. Duplicate requests
+        with the same key within the processing window return the original response.
       tags: ["Provenance"]
       parameters:
         - $ref: '#/components/parameters/IdempotencyKey'
@@ -175,7 +195,9 @@ paths:
                   description: "Stringified JSON payload matching the PhotoRegistrationRequest schema."
       responses:
         '200':
-          description: Protected binary asset.
+          description: |
+            Protected binary asset. **Always returned as `image/jpeg`** regardless
+            of the original input format.
           headers:
             x-request-id:
               $ref: '#/components/headers/x-request-id'
@@ -357,7 +379,7 @@ components:
 
     LoginRequest:
       type: object
-      required: [ tenantId, username, password ]
+      required: [tenantId, username, password]
       properties:
         tenantId:
           type: string
@@ -416,7 +438,7 @@ components:
           example: "550e8400-e29b-41d4-a716-446655440000"
         tenantId:
           type: string
-          description: Contextual Tenant ID derived from the session (For debug/correlation).
+          description: Contextual Tenant ID derived from the session (for debug/correlation).
           example: "tenant_alpha_01"
         signature:
           type: string
