@@ -357,12 +357,20 @@ components:
 
     LoginRequest:
       type: object
-      required: [username, password]
+      required: [ tenantId, username, password ]
       properties:
+        tenantId:
+          type: string
+          description: >
+            Organizational tenant identifier. Must not contain "::".
+            Provided by the LumaTrace onboarding team for each enterprise account.
+          example: "acme-corp-prod"
+          pattern: '^[^:]{1,64}$'
         username:
           type: string
-          description: Service Account identifier.
+          description: Service Account identifier within the tenant. Must not contain "::".
           example: "service_acct_prod"
+          pattern: '^[^:]{1,128}$'
         password:
           type: string
           description: Service Account secret.

@@ -1,14 +1,15 @@
 {
   "info": {
     "name": "LumaTrace Cloud API (Enterprise B2B)",
-    "description": "Official Postman collection for LumaTrace digital asset protection and C2PA provenance verification.\n\n**Operational Limits:**\n- Max Payload: 25MB\n- Max Resolution: 16MP\n\n**Setup:**\n1. Set the `base_url` variable to your target environment (e.g., `https://api.lumatrace.es` or `http://localhost:8081`).\n2. Set your `username` and `password` for the M2M service account.\n3. Run the **1. Authenticate Tenant (Login)** request. The `jwt_token` will be automatically saved and injected into subsequent requests.",
+    "description": "Official Postman collection for LumaTrace digital asset protection and C2PA provenance verification.\n\n**Operational Limits:**\n- Max Payload: 25MB\n- Max Resolution: 16MP\n\n**Setup:**\n1. Set the `base_url` variable to your target environment (e.g., `https://api.lumatrace.es` or `http://localhost:8081`).\n2. Set your `tenant_id`, `username` and `password` for the M2M service account.\n3. Run the **1. Authenticate Tenant (Login)** request. The `jwt_token` will be automatically saved and injected into subsequent requests.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "base_url", "value": "https://api.lumatrace.es", "type": "string" },
+    { "key": "base_url",  "value": "https://api.lumatrace.es", "type": "string" },
     { "key": "jwt_token", "value": "", "type": "string" },
-    { "key": "username", "value": "", "type": "string" },
-    { "key": "password", "value": "", "type": "string" }
+    { "key": "tenant_id", "value": "", "type": "string" },
+    { "key": "username",  "value": "", "type": "string" },
+    { "key": "password",  "value": "", "type": "string" }
   ],
   "item": [
     {
@@ -39,7 +40,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}"
+              "raw": "{\n    \"tenantId\": \"{{tenant_id}}\",\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}"
             },
             "url": { "raw": "{{base_url}}/api/v1/auth/login", "host": ["{{base_url}}"], "path": ["api","v1","auth","login"] }
           }
