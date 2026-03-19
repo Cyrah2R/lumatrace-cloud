@@ -86,7 +86,7 @@ Reference: [Data Privacy Policy](./DATA_PRIVACY.md) · [Subprocessors](./SUBPROC
 | TLS 1.3                        | Enforced at API Gateway / Load Balancer                       | ✅ Active |
 | Certificate pinning (mobile)   | `network_security_config.xml` — production domain pinned      | ✅ Active |
 
-Reference: [STRIDE Threat Model](./docs/THREAT_MODEL_STRIDE.md) · [Compliance Matrix](./docs/COMPLIANCE_MATRIX.md)
+Reference: STRIDE Threat Model *(WIP)* · Compliance Matrix *(WIP)*
 
 ---
 
@@ -99,7 +99,7 @@ Reference: [STRIDE Threat Model](./docs/THREAT_MODEL_STRIDE.md) · [Compliance M
 | Prometheus metrics  | `/actuator/prometheus` — protection latency, success/failure counters | ✅ Active |
 | Anti-DoS pre-flight | Pixel count (16MP) + payload size (25MB) checked before memory load   | ✅ Active |
 
-Reference: [SLA & Incident Response](./SLA_AND_INCIDENTS.md) · [Operations Runbook](./docs/OPERATIONS_RUNBOOK.md)
+Reference: [SLA & Incident Response](./SLA_AND_INCIDENTS.md) · Operations Runbook *(WIP)*
 
 ---
 

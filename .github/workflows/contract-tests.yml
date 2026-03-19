@@ -77,6 +77,9 @@ jobs:
         run: |
           newman run postman/LumaTrace_Cloud_API.postman_collection.json \
             --env-var "base_url=http://127.0.0.1:4010" \
+            --env-var "tenant_id=system-admin-tenant" \
+            --env-var "username=admin" \
+            --env-var "password=Admin_LumaTrace_2026#" \
             --reporters cli \
             --working-dir .
 
