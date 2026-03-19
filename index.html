@@ -8,13 +8,30 @@
               href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.css" />
 
         <style>
-            body { margin: 0; font-family: Arial, sans-serif; }
+            body {
+                margin: 0;
+                font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                background-color: #f4f6f8;
+            }
+
             .topbar {
-                background-color: #111;
-                color: #fff;
-                padding: 12px 20px;
-                font-size: 20px;
-                font-weight: bold;
+                background-color: #3b4151;
+                color: #ffffff;
+                padding: 18px 30px;
+                font-size: 22px;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                border-bottom: 3px solid #565e74;
+            }
+
+            #swagger-ui {
+                max-width: 1200px;
+                margin: 30px auto;
+                background-color: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+                padding-bottom: 20px;
             }
         </style>
     </head>
@@ -22,7 +39,9 @@
     <body>
 
         <div class="topbar">
-            LumaTrace Enterprise API Documentation
+            <span style="display: flex; align-items: center;">
+                LumaTrace Enterprise API Documentation
+            </span>
         </div>
 
         <div id="swagger-ui"></div>
@@ -38,7 +57,7 @@
                     docExpansion: "none",
                     defaultModelsExpandDepth: -1,
                     displayRequestDuration: true,
-                    persistAuthorization: true, /* Keeps the JWT token active if the auditor refreshes the page */
+                    persistAuthorization: true,
                     layout: "BaseLayout"
                 });
             };
