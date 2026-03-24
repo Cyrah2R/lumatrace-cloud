@@ -74,12 +74,14 @@ jobs:
         run: sleep 8
 
       - name: Run Postman Collection via Newman
+        env:
+          TEST_PASSWORD: ${{ secrets.PRISM_TEST_PASSWORD }}
         run: |
           newman run postman/LumaTrace_Cloud_API.postman_collection.json \
             --env-var "base_url=http://127.0.0.1:4010" \
             --env-var "tenant_id=system-admin-tenant" \
             --env-var "username=admin" \
-            --env-var "password=Admin_LumaTrace_2026#" \
+            --env-var "password=${TEST_PASSWORD}" \
             --reporters cli \
             --working-dir .
 
