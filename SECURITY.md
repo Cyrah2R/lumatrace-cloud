@@ -104,7 +104,7 @@ Supply chain documentation available under NDA.
 
 # 7. Cryptographic Standards
 
-- JWT Signing: RS256
+- JWT Signing: HS256
 - TLS 1.3+ enforced
 - AES-256 for data at rest
 - Key rotation: 90-day maximum lifecycle

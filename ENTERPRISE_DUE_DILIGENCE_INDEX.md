@@ -28,7 +28,7 @@ Detailed documents are available under NDA upon request.
 
 ## 3. Cryptography & Key Management
 
-- JWT Signing: RS256
+- JWT Signing: HS256 (HMAC-SHA256)
 - Key Rotation: 90 days
 - KMS-backed signing keys
 - Algorithm agility supported
