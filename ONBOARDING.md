@@ -20,11 +20,28 @@ curl -X POST [https://api.lumatrace.es/api/v1/auth/login](https://api.lumatrace.
 
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  "token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
 ```
 
 Store the token value. It must be included in the Authorization header of subsequent requests.
+
+### Decoded JWT Payload (For Debugging):
+
+The returned token is an RS256-signed JWT. If you decode the payload (e.g., via jwt.io during development), you will find strict authorization claims enforcing your tenant boundary:
+
+```json
+{
+"sub": "your_service_account",
+"auth": "ROLE_USER",
+"tenant_id": "your_tenant_id",
+"iss": "LumaTrace-Enterprise-CA",
+"aud": ["LumaTrace-Cloud-API"],
+"jti": "a1b2c3d4-..."
+}
+```
+
+Note: jti is a unique token identifier used by LumaTrace for active session revocation (blocklisting) upon logout. Cross-tenant access is structurally prevented if the tenant_id claim does not match the requested resource.
 
 ## Step 2 — Validate Asset Requirements
 
