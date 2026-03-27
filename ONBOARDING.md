@@ -102,3 +102,14 @@ curl -X POST https://api.lumatrace.es/api/v1/photos/verify \
 
 For automation workflows, refer to the /examples directory and the official Postman collection.
 
+## Common Integration Errors & Troubleshooting
+
+To accelerate your integration, here are the most common errors encountered during onboarding and how to resolve them:
+
+| HTTP Status               | Error Code / Context            | Common Cause & Resolution                                                                                                                                                                |
+|:--------------------------|:--------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **400 Bad Request**       | Login fails                     | **Cause:** Missing `tenantId`, `username`, or `password` in the JSON payload.<br>**Fix:** Ensure all three fields are provided exactly as shown in Step 1.                               |
+| **401 Unauthorized**      | `AUTH_EXPIRED` or Missing Token | **Cause:** The JWT has expired (TTL is 60 minutes) or the `Authorization: Bearer` header is missing/malformed.<br>**Fix:** Request a new token via `/api/v1/auth/login`.                 |
+| **400 Bad Request**       | Invalid `contentHash`           | **Cause:** The provided hash is not a valid 64-character lowercase hex string.<br>**Fix:** Ensure you are calculating a strict SHA-256 hash of the binary file before submission.        |
+| **413 Payload Too Large** | `PAYLOAD_TOO_LARGE`             | **Cause:** The submitted image exceeds the 25MB file size limit or the 16 Megapixel resolution limit.<br>**Fix:** Compress or downscale the asset client-side before calling `/protect`. |
+| **400 Bad Request**       | Unsupported Media Type          | **Cause:** The image format is not supported by the forensic engine.<br>**Fix:** Ensure the uploaded file is a valid `image/jpeg`, `image/png`, or `image/webp`.                         |
