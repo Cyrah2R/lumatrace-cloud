@@ -15,7 +15,7 @@ info:
 
     **Authentication Profile (M2M):**
     - Machine-to-Machine (M2M) Service Account flows.
-    - JWT tokens are short-lived HS256 (HMAC-SHA256) signatures (15m default expiration).
+    - JWT tokens are short-lived RS256 asymmetric signatures (60m default expiration).
 
     **SLA Targets (Production):**
     - Availability: 99.9%

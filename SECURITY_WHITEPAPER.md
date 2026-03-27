@@ -44,8 +44,8 @@ Only minimal metadata (non-binary) may be retained per contractual configuration
 # 3. Cryptographic Trust Boundaries
 
 ### 3.1 JWT Authentication
-- HS256 signed tokens
-- Short-lived (15 minutes)
+- RS256 asymmetric signatures (JWKS supported)
+- Short-lived (60 minutes, configurable)
 - Tenant-scoped claims
 - Non-refreshable
 
