@@ -9,7 +9,7 @@ Detailed documents are available under NDA upon request.
 
 | Artifact                        | Owner         | Last Updated  | Review Cadence  | Availability  |
 |---------------------------------|---------------|---------------|-----------------|---------------|
-| Threat Model                    | Security Lead | Jan 2026      | Annual          | NDA           |
+| Threat Model (v1.1)             | Security Lead | Mar 2026      | Annual          | NDA           |
 | Secure SDLC Policy              | Engineering   | Dec 2025      | Annual          | NDA           |
 | Incident Response Plan          | Security      | Jan 2026      | Annual          | NDA           |
 | Vulnerability Management Policy | Security      | Jan 2026      | Quarterly       | NDA           |
