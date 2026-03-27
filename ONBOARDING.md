@@ -11,9 +11,9 @@ All API interactions require a valid tenant-scoped JWT.
 ### Request
 
 ```bash
-curl -X POST https://api.lumatrace.es/api/v1/auth/login \
+curl -X POST [https://api.lumatrace.es/api/v1/auth/login](https://api.lumatrace.es/api/v1/auth/login) \
   -H "Content-Type: application/json" \
-  -d '{"username": "your_service_account", "password": "your_password"}'
+  -d '{"tenantId": "your_tenant_id", "username": "your_service_account", "password": "your_password"}'
 ```
 
 ### Response
