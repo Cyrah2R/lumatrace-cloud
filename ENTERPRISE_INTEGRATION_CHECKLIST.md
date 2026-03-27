@@ -4,7 +4,7 @@ This checklist defines the technical requirements for production-grade integrati
 
 ## 1. Identity & Access Management
 - [ ] **M2M Credentials:** Service account credentials stored in a secure Vault (not in .env or source).
-- [ ] **Token Management:** Client implements automatic JWT renewal before the 60-minute TTL expiry.
+- [ ] **Token Management:** Client implements automatic session renewal by re-authenticating via `/api/v1/auth/login` before the 60-minute TTL expiry (LumaTrace JWTs are strictly non-refreshable by design).
 - [ ] **Audit Scopes:** Integration uses specific scopes if configured (default: `tenant_access`).
 
 ## 2. Resilience & Reliability
