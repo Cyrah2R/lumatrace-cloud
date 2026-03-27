@@ -92,12 +92,12 @@ Reference: STRIDE Threat Model *(WIP)* · Compliance Matrix *(WIP)*
 
 ## 6. Observability & Resilience
 
-| Control             | Evidence                                                              | Status   |
-|:--------------------|:----------------------------------------------------------------------|:---------|
-| Distributed tracing | `x-request-id` + MDC `trace_id` / `tenant_id` on all responses        | ✅ Active |
-| SLA commitments     | 99.9% availability, P95 latency < 800ms (`/verify`)                   | ✅ Active |
-| Prometheus metrics  | `/actuator/prometheus` — protection latency, success/failure counters | ✅ Active |
-| Anti-DoS pre-flight | Pixel count (16MP) + payload size (25MB) checked before memory load   | ✅ Active |
+| Control             | Evidence                                                              | Status |
+|:--------------------|:----------------------------------------------------------------------|:-------|
+| Distributed tracing | `x-request-id` + MDC `trace_id` / `tenant_id` on all responses        | Active |
+| SLA commitments     | 99.9% availability, P95 latency < 800ms (`/verify`)                   | Active |
+| Prometheus metrics  | `/actuator/prometheus` — protection latency, success/failure counters | Active |
+| Anti-DoS pre-flight | Pixel count (16MP) + payload size (25MB) checked before memory load   | Active |
 
 Reference: [SLA & Incident Response](./SLA_AND_INCIDENTS.md) · Operations Runbook *(WIP)*
 
@@ -105,10 +105,10 @@ Reference: [SLA & Incident Response](./SLA_AND_INCIDENTS.md) · Operations Runbo
 
 ## 7. Penetration Testing & Audit
 
-| Engagement                            | Scope                                            | Result                                               | Availability                                                                                           |
-|:--------------------------------------|:-------------------------------------------------|:-----------------------------------------------------|:-------------------------------------------------------------------------------------------------------|
-| Grey-Box API Pentest (2026-01)        | Cloud API, Auth flows, Tenant Isolation          | 0 Critical · 0 High · Medium/Low resolved within SLA | Redacted summary: [PENTEST_SUMMARY_TEMPLATE.md](./PENTEST_SUMMARY_TEMPLATE.md) · Full report under NDA |
-| External Architecture Audit (2026-03) | All 4 repositories — server, core, mobile, cloud | All P0 blockers resolved (H-01, H-02, H-03, B1, B2)  | Available under NDA                                                                                    |
+| Engagement                            | Scope                                            | Result                                               | Availability                                                                                                           |
+|:--------------------------------------|:-------------------------------------------------|:-----------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------|
+| Grey-Box API Pentest                  | Cloud API, Auth flows, Tenant Isolation          | [PENDING — Scheduled Q2 2026]                        | Redacted summary: [PENTEST_SUMMARY_TEMPLATE.md](./PENTEST_SUMMARY_TEMPLATE.md) · Full report under NDA upon completion |
+| External Architecture Audit (2026-03) | All 4 repositories — server, core, mobile, cloud | All P0 blockers resolved (H-01, H-02, H-03, B1, B2)  | Available under NDA                                                                                                    |
 
 ---
 

@@ -3,7 +3,7 @@
 This document provides a summary of the technical evidence available for Enterprise due diligence under NDA.
 
 ## 1. Security Validations
-- **Pentest Executive Summary:** Last performed 2026-01. Result: *Clean (0 Critical, 0 High).* Signed by independent third-party auditor.
+- **Pentest Executive Summary:** [PENDING — Scheduled Q2 2026]. Will be signed by an independent third-party auditor upon completion.
 - **SBOM (Software Bill of Materials):** CycloneDX inventory updated for every production release. (Current Release: v1.2.0, Last Generated: 2026-02-27).
 - **Key Management & Hardening:** Verified 90-day rotation policy for all C2PA signing keys. Infrastructure hardening baseline attestation available.
 
