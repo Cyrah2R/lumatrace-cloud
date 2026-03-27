@@ -28,11 +28,11 @@ Detailed documents are available under NDA upon request.
 
 ## 3. Cryptography & Key Management
 
-- JWT Signing: HS256 (HMAC-SHA256)
-- Key Rotation: 90 days
-- KMS-backed signing keys
-- Algorithm agility supported
-- Zero plaintext key exposure outside trust boundary
+- JWT Signing: RS256 (RSA-2048) Asymmetric
+- Identity Provider: JWKS endpoint enabled (`/.well-known/jwks.json`) for M2M offline verification
+- Key Rotation: 90 days (supported via `kid` headers)
+- KMS-backed signing keys (for C2PA JUMBF manifests)
+- Zero plaintext private key exposure outside the container trust boundary
 
 Public cryptography whitepaper available upon request.
 
