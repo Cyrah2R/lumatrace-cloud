@@ -10,7 +10,7 @@ This document provides a summary of the technical evidence available for Enterpr
 ## 2. Infrastructure & Compliance
 - **Control Matrix:** Full SOC 2 and ISO/IEC 27001 control mapping matrix available, including implementation status and internal compliance owners.
 - **Multi-Tenant Isolation:** Evidence of Row-Level Security (RLS) and cryptographic tenant scoping.
-- **Data Residency:** Attestation of Spain/Germany residency for all binary processing buffers.
+- **Data Residency:** Attestation of EU-West-3 (Paris) / EU-Central-1 (Frankfurt) residency for all binary processing buffers.
 
 ---
 *To request the full Evidence Pack, please contact: security@lumatrace.es*
