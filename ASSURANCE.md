@@ -35,7 +35,8 @@ Cross-tenant data access is structurally prevented.
 
 ### Digital Signatures
 
-C2PA manifests are signed using enterprise-grade asymmetric cryptography (RSA-PSS, 3072-bit).
+C2PA manifests are signed using enterprise-grade asymmetric cryptography (RSA-PSS).
+Key length is configurable per deployment to balance security and performance requirements (Default: 3072-bit).
 
 Private key material is securely managed and never exposed within public repositories.
 
