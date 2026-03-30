@@ -102,16 +102,12 @@ Supply chain documentation available under NDA.
 
 ---
 
-# 7. Cryptographic Standards
+### 7. Cryptographic Standards
 
-- JWT Signing: HS256
-- TLS 1.3+ enforced
-- AES-256 for data at rest
-- Key rotation: 90-day maximum lifecycle
-- Fail-closed verification design
-- No private key material exposed outside trust boundary
-
-Cryptographic whitepaper available upon request.
+* **Data in Transit:** TLS 1.3
+* **Data at Rest:** AES-256-GCM
+* **JWT Signing:** RS256 (RSA 2048-bit, asymmetric signature)
+* *Integration note:* External clients and microservices can verify token authenticity without sharing secrets by fetching our public keys at the standard endpoint: `/.well-known/jwks.json`
 
 ---
 
@@ -141,5 +137,8 @@ In the event of a confirmed security incident:
 
 ---
 
+### Documentation Synchronization Policy
+Security documentation (including cryptographic standards and endpoints) is reviewed and synchronized with the codebase during the pre-release phase of every major semantic version (vX.Y.0) to prevent configuration drift.
+
 Security inquiries:  
-security@lumatrace.es
+contact@lumatrace.es
